@@ -2,12 +2,13 @@
   "name": "@b1codes/loaders",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "description": "Dynamic particle loaders for React (Web)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "echo \"No tests yet\"",
+    "test": "tsc && node --test test/*.test.js",
     "lint": "echo \"No lint yet\"",
     "typecheck": "tsc --noEmit"
   },
@@ -18,5 +19,10 @@
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "react": "^19.2.8"
+  }
 }
