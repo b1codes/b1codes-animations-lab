@@ -7,3 +7,5 @@
  */
 
 export * from './constants.js';
+export * from './chromatic-pulse.js';
+export * from './particle-engine.js';
