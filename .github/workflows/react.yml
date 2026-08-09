@@ -1,0 +1,31 @@
+name: React (Web) CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'packages/react/**'
+      - 'packages/core/**'
+      - 'lab/**'
+      - '.github/workflows/react.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'packages/react/**'
+      - 'packages/core/**'
+      - 'lab/**'
+      - '.github/workflows/react.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build --filter=@b1codes/loaders
+      - run: npm run typecheck --filter=@b1codes/loaders
+      - run: npm run test --filter=@b1codes/loaders

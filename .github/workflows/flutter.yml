@@ -1,0 +1,33 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'packages/flutter/**'
+      - 'packages/core/**'
+      - 'lab/**'
+      - '.github/workflows/flutter.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'packages/flutter/**'
+      - 'packages/core/**'
+      - 'lab/**'
+      - '.github/workflows/flutter.yml'
+
+jobs:
+  flutter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+      - run: flutter pub get
+        working-directory: packages/flutter
+      - run: flutter analyze
+        working-directory: packages/flutter
+      - run: flutter test
+        working-directory: packages/flutter

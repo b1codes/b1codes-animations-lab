@@ -1,0 +1,26 @@
+name: Swift (SwiftUI) CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'packages/swift/**'
+      - 'packages/core/**'
+      - 'lab/**'
+      - '.github/workflows/swift.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'packages/swift/**'
+      - 'packages/core/**'
+      - 'lab/**'
+      - '.github/workflows/swift.yml'
+
+jobs:
+  swift:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build & Test Swift Package
+        run: swift test
+        working-directory: packages/swift

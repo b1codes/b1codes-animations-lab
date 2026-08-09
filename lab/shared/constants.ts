@@ -78,6 +78,7 @@ export const THERMAL_GLOW_EXCITATION_DURATION = 50;
  * Cooling cycle contraction and fade sequence.
  */
 export const THERMAL_GLOW_DISSIPATION_DURATION = 300;
+export const THERMAL_GLOW_TOTAL_DURATION = 350;
 
 /**
  * Thermal Heat color spectrum transition sequence (`#FF3B30` -> `#FF9500`).
