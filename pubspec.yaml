@@ -1,0 +1,11 @@
+name: b1codes_animations_workspace
+publish_to: none
+
+environment:
+  sdk: ">=3.6.0 <4.0.0"
+
+workspace:
+  - packages/flutter
+
+dev_dependencies:
+  melos: ^8.0.0

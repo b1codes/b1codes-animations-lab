@@ -1,0 +1,26 @@
+{
+  "name": "b1codes-animations-lab",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "npm@11.19.0",
+  "description": "Dynamic particle loaders — Flutter, React, React Native, SwiftUI",
+  "workspaces": [
+    "packages/core",
+    "packages/react",
+    "packages/react-native"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

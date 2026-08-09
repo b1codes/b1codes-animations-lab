@@ -1,0 +1,19 @@
+name: b1codes_animations
+
+packages:
+  - packages/flutter
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+
+scripts:
+  analyze:
+    run: melos exec -- "dart analyze --fatal-infos"
+    description: Run dart analyze across all Flutter packages
+  test:
+    run: melos exec -- "flutter test"
+    description: Run tests across all Flutter packages
+  format:
+    run: melos exec -- "dart format --set-exit-if-changed ."
+    description: Check formatting across all Flutter packages

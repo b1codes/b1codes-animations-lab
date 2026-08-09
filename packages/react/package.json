@@ -1,0 +1,22 @@
+{
+  "name": "@b1codes/loaders",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Dynamic particle loaders for React (Web)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"No tests yet\"",
+    "lint": "echo \"No lint yet\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@b1codes/core": "*"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@b1codes/core",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Internal shared physics solver for b1codes particle loaders",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"No tests yet\"",
+    "lint": "echo \"No lint yet\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "license": "MIT"
+}

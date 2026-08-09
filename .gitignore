@@ -149,6 +149,30 @@ vite.config.ts.timestamp-*
 .agents/modules/llc-security
 .agents/modules/llc-swift
 
+# Turborepo
+.turbo/
+
+# Flutter / Dart
+.dart_tool/
+build/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+packages/flutter/pubspec.lock
+pubspec.lock
+
+# Swift
+.build/
+.swiftpm/
+Package.resolved
+
+# Melos
+.melos/
+*.iml
+
+# IntelliJ IDEA
+.idea/
+
 # b1CodingTool generated agent files
 CLAUDE.md
 CLAUDE.local.md
