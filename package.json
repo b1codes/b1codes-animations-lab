@@ -15,7 +15,8 @@
     "test": "turbo run test && npm run verify:constants",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
-    "verify:constants": "node scripts/verify-constants.js"
+    "verify:constants": "node scripts/verify-constants.js",
+    "lab": "npx serve lab"
   },
   "devDependencies": {
     "turbo": "^2.5.0",

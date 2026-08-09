@@ -83,6 +83,20 @@ npx melos run analyze
 npx melos run test
 ```
 
+### 🧪 Interactive Lab Gallery
+
+To launch and visually inspect the dynamic particle loaders in the interactive reference gallery:
+
+```bash
+# Serve the web lab gallery locally
+npm run lab
+
+# Alternatively, using Python
+python3 -m http.server 8000 --directory lab
+```
+
+Then open the output URL (e.g. `http://localhost:3000` or `http://localhost:8000`) in your browser to interact with **OrbitalLoader**, **NebulaLoader**, and **CascadeLoader** along with live controls for speed, intensity, palette themes, and exit discharge resolution mechanics.
+
 ---
 
 ## 📄 License
