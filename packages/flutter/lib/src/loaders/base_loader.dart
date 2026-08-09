@@ -115,8 +115,14 @@ class _BaseLoaderWidgetState extends State<BaseLoaderWidget>
     }
 
     if (ctrl.isResolving && !_isThermalActive) {
-      _isThermalActive = true;
-      _thermalStartTime = _elapsedMs;
+      final isReducedMotion = widget.reducedMotion ??
+          MediaQuery.of(context).disableAnimations;
+      if (isReducedMotion) {
+        widget.onDismiss?.call();
+      } else {
+        _isThermalActive = true;
+        _thermalStartTime = _elapsedMs;
+      }
     }
   }
 

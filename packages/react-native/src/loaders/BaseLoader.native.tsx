@@ -108,6 +108,10 @@ export const BaseLoader = memo(
       (): LoaderRef => ({
         resolve: () => {
           if (thermalGlowRef.current.active) return;
+          if (isReducedMotionState) {
+            onDismiss?.();
+            return;
+          }
           thermalGlowRef.current = {
             active: true,
             startTime: typeof performance !== 'undefined' ? performance.now() : Date.now(),

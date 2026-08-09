@@ -67,7 +67,8 @@ class ParticlePainter extends CustomPainter {
         final dy = p.y - cy;
         final dist = math.sqrt(dx * dx + dy * dy);
         final safeDist = dist == 0 ? 1.0 : dist;
-        final scatterMag = safeDist * (1 + t * 1.8);
+        final easedT = 1.0 - math.pow(1.0 - t, 4.0).toDouble();
+        final scatterMag = safeDist * (1 + easedT * 1.8);
 
         drawX = cx + (dx / safeDist) * scatterMag;
         drawY = cy + (dy / safeDist) * scatterMag;

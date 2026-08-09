@@ -81,10 +81,11 @@ export function SkiaParticleCanvas(props: SkiaRendererProps) {
 
     if (thermalGlow.active) {
       const t = thermalGlow.progress;
+      const easedT = 1 - Math.pow(1 - t, 4);
       const dx = p.x - cx;
       const dy = p.y - cy;
       const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-      const scatterMag = dist * (1 + t * 1.8);
+      const scatterMag = dist * (1 + easedT * 1.8);
 
       drawX = cx + (dx / dist) * scatterMag;
       drawY = cy + (dy / dist) * scatterMag;

@@ -84,8 +84,12 @@ public struct BaseLoaderView: View {
         }
         .onChange(of: controller.isResolving) { resolving in
             if resolving && !isThermalActive {
-                isThermalActive = true
-                thermalStartTime = elapsedMs
+                if isReducedMotionActive {
+                    onDismiss?()
+                } else {
+                    isThermalActive = true
+                    thermalStartTime = elapsedMs
+                }
             }
         }
         .onChange(of: controller.isPaused) { paused in
@@ -207,7 +211,8 @@ public struct BaseLoaderView: View {
                 let dy = p.y - cy
                 let dist = sqrt(dx * dx + dy * dy)
                 let safeDist = dist == 0 ? 1.0 : dist
-                let scatterMag = safeDist * (1.0 + t * 1.8)
+                let easedT = 1.0 - pow(1.0 - t, 4.0)
+                let scatterMag = safeDist * (1.0 + easedT * 1.8)
 
                 drawX = cx + (dx / safeDist) * scatterMag
                 drawY = cy + (dy / safeDist) * scatterMag

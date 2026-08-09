@@ -68,4 +68,20 @@ describe('@b1codes/loaders React Component Suite', () => {
 
     assert.equal(nebulaElem.props.reducedMotion, true);
   });
+
+  it('validates onDismiss callback prop passing for Thermal Glow exit discharge', () => {
+    let dismissed = false;
+    const onDismiss = () => {
+      dismissed = true;
+    };
+
+    const orbitalElem = React.createElement(OrbitalLoader, {
+      palette: ['#4A90E2', '#50E3C2'],
+      onDismiss,
+    });
+
+    assert.equal(typeof orbitalElem.props.onDismiss, 'function');
+    orbitalElem.props.onDismiss();
+    assert.equal(dismissed, true);
+  });
 });

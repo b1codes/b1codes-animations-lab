@@ -10,9 +10,16 @@ import {
   PARTICLE_MASS_TIERS,
   REFRACTIVE_DEPTH_LAYERS,
   CHROMATIC_PULSE_DURATION,
+  THERMAL_GLOW_SPECTRUM,
+  THERMAL_GLOW_TOTAL_DURATION,
 } from '../../shared/constants.js';
 
-import { ChromaticPulse } from '../../shared/particle-engine.js';
+import {
+  ChromaticPulse,
+  parseColorToRGB,
+  interpolateRGB,
+  rgbToHex,
+} from '../../shared/particle-engine.js';
 
 export interface NebulaLoaderOptions {
   /** Target SVG element ID or HTML container element */
@@ -150,6 +157,10 @@ export class NebulaLoader {
   private fpsFrameCount = 0;
   private fpsLastCheckTime = 0;
   private currentFPS = 60;
+
+  private isThermalActive = false;
+  private thermalStartTime = 0;
+  private onDismissCallback?: () => void;
 
   constructor(options: NebulaLoaderOptions) {
     if (typeof options.container === 'string') {
@@ -355,6 +366,50 @@ export class NebulaLoader {
     const cx = this.config.width / 2;
     const cy = this.config.height / 2;
 
+    if (this.isThermalActive) {
+      const elapsedThermal = this.elapsedMs - this.thermalStartTime;
+      const progress = Math.min(1.0, elapsedThermal / THERMAL_GLOW_TOTAL_DURATION);
+
+      if (progress >= 1.0) {
+        this.stop();
+        if (this.svgEl) this.svgEl.style.display = 'none';
+        const cb = this.onDismissCallback;
+        this.onDismissCallback = undefined;
+        cb?.();
+        return;
+      }
+
+      const heatStartRGB = parseColorToRGB(THERMAL_GLOW_SPECTRUM[0]);
+      const heatEndRGB = parseColorToRGB(THERMAL_GLOW_SPECTRUM[1]);
+      const currentHeatRGB = interpolateRGB(heatStartRGB, heatEndRGB, progress);
+      const thermalColor = rgbToHex(currentHeatRGB);
+      const easedProgress = 1 - Math.pow(1 - progress, 4);
+
+      this.particles.forEach((p) => {
+        const circleEl = this.svgEl?.querySelector(`#nebula-particle-${p.id}`) as SVGCircleElement | null;
+        if (!circleEl) return;
+
+        const dx = p.x - cx;
+        const dy = p.y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const scatterMag = dist * (1 + easedProgress * 1.8);
+
+        const drawX = cx + (dx / dist) * scatterMag;
+        const drawY = cy + (dy / dist) * scatterMag;
+
+        const baseScale = p.massTier.sizeRatio * this.config.intensity;
+        const finalRadius = Math.max(1.5, 3.5 * baseScale * p.depthLayer.scale);
+        const finalOpacity = Math.max(0, pulseState.opacity * p.depthLayer.opacityMultiplier * (1 - progress));
+
+        circleEl.setAttribute('cx', drawX.toFixed(2));
+        circleEl.setAttribute('cy', drawY.toFixed(2));
+        circleEl.setAttribute('r', finalRadius.toFixed(2));
+        circleEl.setAttribute('fill', thermalColor);
+        circleEl.setAttribute('opacity', finalOpacity.toFixed(3));
+      });
+      return;
+    }
+
     // Density breathing factor (0.5 to 1.0) synced with CHROMATIC_PULSE_DURATION
     const breathPhase = (this.elapsedMs % CHROMATIC_PULSE_DURATION) / CHROMATIC_PULSE_DURATION;
     const densityBreathing = 0.75 + 0.25 * Math.sin(breathPhase * Math.PI * 2);
@@ -540,6 +595,44 @@ export class NebulaLoader {
 
   public getFPS(): number {
     return this.currentFPS;
+  }
+
+  /**
+   * Triggers Thermal Glow exit discharge sequence (~350ms),
+   * accelerating particles outward before dissolving and firing onDismiss.
+   */
+  public resolve(onDismiss?: () => void): void {
+    if (this.isThermalActive) return;
+    this.onDismissCallback = onDismiss;
+
+    if (this.config.reducedMotion) {
+      this.stop();
+      if (this.svgEl) this.svgEl.style.display = 'none';
+      const cb = this.onDismissCallback;
+      this.onDismissCallback = undefined;
+      cb?.();
+      return;
+    }
+
+    this.isThermalActive = true;
+    this.thermalStartTime = this.elapsedMs;
+  }
+
+  /**
+   * Resets loader simulation to initial state.
+   */
+  public reset(): void {
+    this.stop();
+    this.isThermalActive = false;
+    this.thermalStartTime = 0;
+    this.onDismissCallback = undefined;
+    if (this.svgEl) this.svgEl.style.display = 'block';
+    this.elapsedMs = 0;
+    const seed = this.config.seed ?? Math.floor(Math.random() * 1000000);
+    this.prng = new PRNG(seed);
+    this.initNebulaParticles();
+    this.renderInitialDOM();
+    this.start();
   }
 
   public destroy(): void {
