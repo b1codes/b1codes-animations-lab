@@ -1,0 +1,95 @@
+/**
+ * @file lab/loaders/orbital/orbital.css
+ * @description Styling and CSS animation variables for OrbitalLoader prototype.
+ */
+
+:root {
+  --orbital-loader-size: 200px;
+  --orbital-pulse-color: #4A90E2;
+  --orbital-bg-color: transparent;
+  --orbital-glow-intensity: 0.7;
+}
+
+/* Base Loader Container */
+.orbital-loader-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--orbital-loader-size);
+  height: var(--orbital-loader-size);
+  background-color: var(--orbital-bg-color);
+  position: relative;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+#orbital-loader {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+
+/* Gravitational Center Core */
+.core-glow-outer {
+  transition: fill 0.3s ease;
+  transform-origin: center;
+}
+
+.core-dot {
+  transition: fill 0.3s ease;
+}
+
+/* Orbital Guides */
+.guide-ellipse {
+  transition: stroke 0.3s ease;
+}
+
+/* Particle Elements */
+.orbital-particle {
+  transition: fill 0.1s linear, opacity 0.1s linear;
+  will-change: transform, opacity, fill;
+}
+
+/* Particle Mass Tier Attributes */
+.orbital-particle[data-mass-tier="dust"] {
+  opacity: 0.7;
+}
+
+.orbital-particle[data-mass-tier="motes"] {
+  opacity: 0.85;
+}
+
+.orbital-particle[data-mass-tier="cores"] {
+  opacity: 1.0;
+  filter: drop-shadow(0 0 3px var(--orbital-pulse-color));
+}
+
+/* Organic Orbit Perturbation State */
+.orbital-particle.perturbed {
+  stroke: #FFFFFF;
+  stroke-width: 0.75px;
+}
+
+/* Reduced Motion Mode Support */
+.reduced-motion-active #orbital-particles-stack,
+.reduced-motion-active .gravitational-field,
+.reduced-motion-active .orbital-guides {
+  display: none !important;
+}
+
+.reduced-motion-active #orbital-reduced-motion-grid {
+  display: block !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #orbital-particles-stack,
+  .gravitational-field,
+  .orbital-guides {
+    display: none !important;
+  }
+
+  #orbital-reduced-motion-grid {
+    display: block !important;
+  }
+}

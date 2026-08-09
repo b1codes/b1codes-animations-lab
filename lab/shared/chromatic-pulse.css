@@ -1,0 +1,57 @@
+/**
+ * @file lab/shared/chromatic-pulse.css
+ * @description Reference CSS variables, keyframes, and utility classes for Chromatic Pulse.
+ */
+
+:root {
+  --chromatic-pulse-duration: 3.2s;
+  --chromatic-ease: cubic-bezier(0.45, 0, 0.55, 1);
+  --chromatic-opacity-min: 0.55;
+  --chromatic-opacity-max: 1.0;
+  
+  --palette-color-1: #4A90E2;
+  --palette-color-2: #50E3C2;
+  --palette-color-3: #9013FE;
+  
+  --chromatic-pulse-color: var(--palette-color-1);
+}
+
+@keyframes chromatic-color-loop-3 {
+  0%, 100% {
+    color: var(--palette-color-1);
+    fill: var(--palette-color-1);
+    stroke: var(--palette-color-1);
+  }
+  33.33% {
+    color: var(--palette-color-2);
+    fill: var(--palette-color-2);
+    stroke: var(--palette-color-2);
+  }
+  66.66% {
+    color: var(--palette-color-3);
+    fill: var(--palette-color-3);
+    stroke: var(--palette-color-3);
+  }
+}
+
+@keyframes chromatic-opacity-breathe {
+  0%, 100% {
+    opacity: var(--chromatic-opacity-max);
+  }
+  50% {
+    opacity: var(--chromatic-opacity-min);
+  }
+}
+
+.chromatic-pulse-active {
+  animation: 
+    chromatic-color-loop-3 var(--chromatic-pulse-duration) var(--chromatic-ease) infinite,
+    chromatic-opacity-breathe var(--chromatic-pulse-duration) ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chromatic-pulse-active {
+    animation: none !important;
+    opacity: 1.0 !important;
+  }
+}

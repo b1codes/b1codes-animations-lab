@@ -1,0 +1,55 @@
+<svg id="orbital-loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Orbital Loading Indicator">
+  <defs>
+    <!-- Multi-layer refractive depth filters -->
+    <filter id="refractive-bg-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4.0" />
+    </filter>
+    
+    <filter id="refractive-mid-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.0" />
+    </filter>
+
+    <filter id="orbital-glow-filter" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6.0" result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Gravitational core radial gradient -->
+    <radialGradient id="gravitational-core-gradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="var(--orbital-pulse-color, #4A90E2)" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="var(--orbital-pulse-color, #4A90E2)" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="var(--orbital-pulse-color, #4A90E2)" stop-opacity="0.0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Gravitational Center Field -->
+  <g class="gravitational-field">
+    <circle class="core-glow-outer" cx="100" cy="100" r="32" fill="url(#gravitational-core-gradient)" filter="url(#orbital-glow-filter)" />
+    <circle class="core-dot" cx="100" cy="100" r="4" fill="var(--orbital-pulse-color, #4A90E2)" opacity="0.9" />
+  </g>
+
+  <!-- Elliptical Orbital Guides (Visual reference paths) -->
+  <g class="orbital-guides" opacity="0.15">
+    <ellipse cx="100" cy="100" rx="40" ry="24" class="guide-ellipse" transform="rotate(-15 100 100)" fill="none" stroke="var(--orbital-pulse-color, #FFFFFF)" stroke-width="1" stroke-dasharray="2 4" />
+    <ellipse cx="100" cy="100" rx="65" ry="42" class="guide-ellipse" transform="rotate(30 100 100)" fill="none" stroke="var(--orbital-pulse-color, #FFFFFF)" stroke-width="1" stroke-dasharray="2 4" />
+    <ellipse cx="100" cy="100" rx="85" ry="58" class="guide-ellipse" transform="rotate(-45 100 100)" fill="none" stroke="var(--orbital-pulse-color, #FFFFFF)" stroke-width="1" stroke-dasharray="2 4" />
+  </g>
+
+  <!-- Particle Render Layers (Refractive Depth Stack) -->
+  <g id="orbital-particles-stack">
+    <!-- Background layer (Diffused) -->
+    <g id="orbital-layer-background" filter="url(#refractive-bg-blur)" opacity="0.5"></g>
+    
+    <!-- Midground layer (Soft Focus) -->
+    <g id="orbital-layer-midground" filter="url(#refractive-mid-blur)" opacity="0.8"></g>
+    
+    <!-- Foreground layer (Crisp & High Contrast) -->
+    <g id="orbital-layer-foreground" filter="url(#orbital-glow-filter)"></g>
+  </g>
+
+  <!-- Reduced Motion Static Dot Grid Fallback (hidden by default, shown when reduced motion active) -->
+  <g id="orbital-reduced-motion-grid" display="none"></g>
+</svg>
