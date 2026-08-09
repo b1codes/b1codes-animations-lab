@@ -4,4 +4,7 @@
  * React Native 0.76+ | Skia Canvas renderer for particle systems.
  */
 
-export {};
+export * from './types.js';
+export { OrbitalLoader } from './loaders/OrbitalLoader.js';
+export { NebulaLoader } from './loaders/NebulaLoader.js';
+export { CascadeLoader } from './loaders/CascadeLoader.js';

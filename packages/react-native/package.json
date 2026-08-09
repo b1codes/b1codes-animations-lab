@@ -2,12 +2,13 @@
   "name": "@b1codes/loaders-react-native",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "description": "Dynamic particle loaders for React Native",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "echo \"No tests yet\"",
+    "test": "tsc && node --import ./test/register.js --test test/loaders.test.js",
     "lint": "echo \"No lint yet\"",
     "typecheck": "tsc --noEmit"
   },
@@ -15,9 +16,16 @@
     "@b1codes/core": "*"
   },
   "peerDependencies": {
+    "@shopify/react-native-skia": ">=1.0.0",
     "react": ">=19.0.0",
-    "react-native": ">=0.76.0",
-    "@shopify/react-native-skia": ">=1.0.0"
+    "react-native": ">=0.76.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@shopify/react-native-skia": "^2.11.0",
+    "@types/react": "^19.2.18",
+    "@types/react-native": "^0.72.8",
+    "react": "^19.2.8",
+    "react-native": "^0.86.2"
+  }
 }
