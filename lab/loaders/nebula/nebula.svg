@@ -1,0 +1,47 @@
+<svg id="nebula-loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300" role="img" aria-label="Nebula Loading Indicator">
+  <defs>
+    <!-- Multi-layer refractive depth filters -->
+    <filter id="nebula-bg-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4.5" />
+    </filter>
+    
+    <filter id="nebula-mid-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.5" />
+    </filter>
+
+    <filter id="nebula-glow-filter" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5.0" result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Interstellar gas ambient cloud background gradient -->
+    <radialGradient id="nebula-ambient-gas" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="var(--nebula-pulse-color, #50E3C2)" stop-opacity="0.2" />
+      <stop offset="50%" stop-color="var(--nebula-pulse-color, #50E3C2)" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="var(--nebula-pulse-color, #50E3C2)" stop-opacity="0.0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Ambient Interstellar Gas Cloud Base -->
+  <g class="nebula-ambient-cloud">
+    <circle cx="150" cy="150" r="120" fill="url(#nebula-ambient-gas)" filter="url(#nebula-bg-blur)" />
+  </g>
+
+  <!-- Particle Render Layers (Refractive Depth Stack) -->
+  <g id="nebula-particles-stack">
+    <!-- Background layer (Diffused Dust) -->
+    <g id="nebula-layer-background" filter="url(#nebula-bg-blur)" opacity="0.45"></g>
+    
+    <!-- Midground layer (Soft Focus Motes) -->
+    <g id="nebula-layer-midground" filter="url(#nebula-mid-blur)" opacity="0.75"></g>
+    
+    <!-- Foreground layer (Crisp Luminous Cores) -->
+    <g id="nebula-layer-foreground" filter="url(#nebula-glow-filter)"></g>
+  </g>
+
+  <!-- Reduced Motion Static Dot Grid Fallback -->
+  <g id="nebula-reduced-motion-grid" display="none"></g>
+</svg>
