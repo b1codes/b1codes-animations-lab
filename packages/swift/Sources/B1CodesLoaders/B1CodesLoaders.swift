@@ -3,5 +3,7 @@
 /// Provides OrbitalLoader, NebulaLoader, and CascadeLoader views
 /// driven by Chromatic Pulse and a shared physics solver.
 ///
-/// Minimum deployment target: iOS 15+
+/// Minimum deployment target: iOS 15+ / macOS 12+
 import SwiftUI
+
+@_exported import Foundation
