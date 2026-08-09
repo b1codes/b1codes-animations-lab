@@ -1,0 +1,50 @@
+<svg id="cascade-loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300" width="200" height="300" role="img" aria-label="Cascade Loading Indicator">
+  <defs>
+    <!-- Refractive depth filters -->
+    <filter id="cascade-bg-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4.0" />
+    </filter>
+    
+    <filter id="cascade-mid-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.0" />
+    </filter>
+
+    <filter id="cascade-glow-filter" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5.0" result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Floor pooling surface glow gradient -->
+    <linearGradient id="cascade-floor-glow-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="var(--cascade-pulse-color, #4A90E2)" stop-opacity="0.0" />
+      <stop offset="25%" stop-color="var(--cascade-pulse-color, #4A90E2)" stop-opacity="0.3" />
+      <stop offset="50%" stop-color="var(--cascade-pulse-color, #4A90E2)" stop-opacity="0.6" />
+      <stop offset="75%" stop-color="var(--cascade-pulse-color, #4A90E2)" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="var(--cascade-pulse-color, #4A90E2)" stop-opacity="0.0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Floor Pooling Surface Glow Bar -->
+  <g class="cascade-floor-surface">
+    <rect class="floor-glow-bar" x="15" y="252" width="170" height="4" rx="2" fill="url(#cascade-floor-glow-gradient)" filter="url(#cascade-glow-filter)" />
+    <line class="floor-baseline" x1="20" y1="254" x2="180" y2="254" stroke="var(--cascade-pulse-color, #4A90E2)" stroke-opacity="0.25" stroke-dasharray="3 3" />
+  </g>
+
+  <!-- Particle Render Layers (Refractive Depth Stack) -->
+  <g id="cascade-particles-stack">
+    <!-- Background layer (Diffused Dust) -->
+    <g id="cascade-layer-background" filter="url(#cascade-bg-blur)" opacity="0.45"></g>
+    
+    <!-- Midground layer (Soft Focus Motes) -->
+    <g id="cascade-layer-midground" filter="url(#cascade-mid-blur)" opacity="0.75"></g>
+    
+    <!-- Foreground layer (Crisp Luminous Matter) -->
+    <g id="cascade-layer-foreground" filter="url(#cascade-glow-filter)"></g>
+  </g>
+
+  <!-- Reduced Motion Static Dot Grid Fallback -->
+  <g id="cascade-reduced-motion-grid" display="none"></g>
+</svg>

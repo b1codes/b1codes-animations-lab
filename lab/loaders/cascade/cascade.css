@@ -1,0 +1,87 @@
+/**
+ * @file lab/loaders/cascade/cascade.css
+ * @description Styling and CSS variables for CascadeLoader prototype.
+ */
+
+:root {
+  --cascade-loader-width: 200px;
+  --cascade-loader-height: 300px;
+  --cascade-pulse-color: #4A90E2;
+  --cascade-bg-color: transparent;
+  --cascade-glow-intensity: 0.7;
+}
+
+/* Base Container */
+.cascade-loader-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--cascade-loader-width);
+  height: var(--cascade-loader-height);
+  background-color: var(--cascade-bg-color);
+  position: relative;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+#cascade-loader {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+
+/* Floor Surface Glow Bar */
+.floor-glow-bar {
+  transition: fill 0.3s ease;
+}
+
+.floor-baseline {
+  transition: stroke 0.3s ease;
+}
+
+/* Particle Elements */
+.cascade-particle {
+  transition: fill 0.1s linear, opacity 0.1s linear;
+  will-change: transform, opacity, fill;
+}
+
+/* Particle Tier Attributes */
+.cascade-particle[data-mass-tier="dust"] {
+  opacity: 0.6;
+}
+
+.cascade-particle[data-mass-tier="motes"] {
+  opacity: 0.8;
+}
+
+.cascade-particle[data-mass-tier="cores"] {
+  opacity: 1.0;
+  filter: drop-shadow(0 0 3px var(--cascade-pulse-color));
+}
+
+/* Floor Pooling / Glow State */
+.cascade-particle.pooling {
+  filter: drop-shadow(0 0 6px var(--cascade-pulse-color));
+}
+
+/* Reduced Motion Mode Support */
+.reduced-motion-active #cascade-particles-stack,
+.reduced-motion-active .cascade-floor-surface {
+  display: none !important;
+}
+
+.reduced-motion-active #cascade-reduced-motion-grid {
+  display: block !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #cascade-particles-stack,
+  .cascade-floor-surface {
+    display: none !important;
+  }
+
+  #cascade-reduced-motion-grid {
+    display: block !important;
+  }
+}
