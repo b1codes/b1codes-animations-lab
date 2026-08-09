@@ -106,6 +106,13 @@ export interface NeuralLoaderProps extends LoaderProps {
   particleCount?: number;
 }
 
+export interface GlobeLoaderProps extends LoaderProps {
+  /**
+   * Total 3D node count for globe loader (defaults to 24, recommended range 16–48).
+   */
+  particleCount?: number;
+}
+
 export interface LoaderRef {
   /**
    * Triggers the Thermal Glow exit discharge sequence (~350ms),

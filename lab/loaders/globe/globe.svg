@@ -1,0 +1,53 @@
+<svg id="globe-loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Globe Loading Indicator">
+  <defs>
+    <!-- Multi-layer refractive depth filters -->
+    <filter id="globe-bg-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4.0" />
+    </filter>
+
+    <filter id="globe-mid-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.0" />
+    </filter>
+
+    <filter id="globe-glow-filter" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5.0" result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Central sphere ambient radial glow -->
+    <radialGradient id="globe-ambient-gradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="var(--globe-pulse-color, #4A90E2)" stop-opacity="0.35" />
+      <stop offset="60%" stop-color="var(--globe-pulse-color, #4A90E2)" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="var(--globe-pulse-color, #4A90E2)" stop-opacity="0.0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Spherical Field & Orbit Guides -->
+  <g class="globe-ambient-field">
+    <circle cx="100" cy="100" r="68" fill="url(#globe-ambient-gradient)" filter="url(#globe-bg-blur)" />
+  </g>
+
+  <!-- Latitude / Longitude Ring Guides -->
+  <g class="globe-rings-layer" opacity="0.2">
+    <ellipse cx="100" cy="100" rx="64" ry="24" fill="none" stroke="var(--globe-pulse-color, #4A90E2)" stroke-width="1" stroke-dasharray="3 4" transform="rotate(-15 100 100)" />
+    <ellipse cx="100" cy="100" rx="64" ry="48" fill="none" stroke="var(--globe-pulse-color, #4A90E2)" stroke-width="1" stroke-dasharray="3 4" transform="rotate(15 100 100)" />
+  </g>
+
+  <!-- 3D Globe Node Stack (Refractive Depth Stack) -->
+  <g id="globe-particles-stack">
+    <!-- Background layer (Back of sphere, diffused) -->
+    <g id="globe-layer-background" filter="url(#globe-bg-blur)" opacity="0.4"></g>
+
+    <!-- Midground layer (Equator, soft focus) -->
+    <g id="globe-layer-midground" filter="url(#globe-mid-blur)" opacity="0.75"></g>
+
+    <!-- Foreground layer (Front of sphere, crisp) -->
+    <g id="globe-layer-foreground" filter="url(#globe-glow-filter)"></g>
+  </g>
+
+  <!-- Reduced Motion Static Dot Grid Fallback -->
+  <g id="globe-reduced-motion-grid" display="none"></g>
+</svg>

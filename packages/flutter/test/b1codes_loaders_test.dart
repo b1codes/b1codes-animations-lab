@@ -130,6 +130,23 @@ void main() {
       expect(find.bySemanticsLabel('Neural Loading'), findsOneWidget);
     });
 
+    testWidgets('GlobeLoader renders with custom palette and particleCount', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: GlobeLoader(
+              palette: [Color(0xFF4A90E2), Color(0xFF50E3C2)],
+              particleCount: 24,
+              semanticsLabel: 'Globe Loading',
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(GlobeLoader), findsOneWidget);
+      expect(find.bySemanticsLabel('Globe Loading'), findsOneWidget);
+    });
+
     testWidgets('CascadeLoader responds to B1CodesLoaderController resolve and pause methods', (WidgetTester tester) async {
       final controller = B1CodesLoaderController();
 

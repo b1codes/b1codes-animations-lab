@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="./loaders/nebula/nebula.css" />
   <link rel="stylesheet" href="./loaders/cascade/cascade.css" />
   <link rel="stylesheet" href="./loaders/neural/neural.css" />
+  <link rel="stylesheet" href="./loaders/globe/globe.css" />
   <style>
     :root {
       --bg-dark: #0B0C10;
@@ -623,6 +624,21 @@
             <button id="btn-resolve-neural" class="btn-card-action" style="background: rgba(255, 59, 48, 0.15); border-color: rgba(255, 59, 48, 0.4); color: #FF6B60;">Resolve</button>
           </footer>
         </article>
+
+        <!-- GlobeLoader Card -->
+        <article class="loader-card">
+          <header class="card-header">
+            <h3 class="loader-title">GlobeLoader</h3>
+            <p class="loader-subtitle">3D rotating sphere of nodes. Indicates global searching or large data fetching operations.</p>
+          </header>
+          <div class="display-box">
+            <div id="loader-globe-main" class="globe-loader-container"></div>
+          </div>
+          <footer class="card-meta">
+            <span class="meta-tag">3D Search • 24 nodes</span>
+            <button id="btn-resolve-globe" class="btn-card-action" style="background: rgba(255, 59, 48, 0.15); border-color: rgba(255, 59, 48, 0.4); color: #FF6B60;">Resolve</button>
+          </footer>
+        </article>
       </div>
     </section>
 
@@ -689,6 +705,7 @@
       <a class="footer-link" href="./loaders/nebula/index.html">Nebula Bench</a>
       <a class="footer-link" href="./loaders/cascade/index.html">Cascade Bench</a>
       <a class="footer-link" href="./loaders/neural/index.html">Neural Bench</a>
+      <a class="footer-link" href="./loaders/globe/index.html">Globe Bench</a>
     </nav>
   </footer>
 
@@ -697,10 +714,11 @@
     import { NebulaLoader } from './loaders/nebula/nebula.js';
     import { CascadeLoader } from './loaders/cascade/cascade.js';
     import { NeuralLoader } from './loaders/neural/neural.js';
+    import { GlobeLoader } from './loaders/globe/globe.js';
 
     let currentPalette = ['#4A90E2', '#50E3C2', '#9013FE'];
 
-    // Main 4 Comparison Loaders
+    // Main 5 Comparison Loaders
     const orbitalMain = new OrbitalLoader({
       container: 'loader-orbital-main',
       particleCount: 18,
@@ -741,6 +759,16 @@
       reducedMotion: false,
     });
 
+    const globeMain = new GlobeLoader({
+      container: 'loader-globe-main',
+      particleCount: 24,
+      palette: currentPalette,
+      speed: 1.0,
+      intensity: 0.7,
+      depth: true,
+      reducedMotion: false,
+    });
+
     // Scale Variant Loaders
     const orbital48 = new OrbitalLoader({ container: 'size-orbital-48', particleCount: 14, palette: currentPalette, width: 200, height: 200 });
     const nebula48 = new NebulaLoader({ container: 'size-nebula-48', particleCount: 24, palette: currentPalette, width: 300, height: 300 });
@@ -751,7 +779,7 @@
     const cascade180 = new CascadeLoader({ container: 'size-cascade-180', particleCount: 32, palette: currentPalette });
 
     const allLoaders = [
-      orbitalMain, nebulaMain, cascadeMain, neuralMain,
+      orbitalMain, nebulaMain, cascadeMain, neuralMain, globeMain,
       orbital48, nebula48, cascade48,
       orbital128, nebula128, cascade180
     ];
@@ -863,6 +891,7 @@
     bindResolve('btn-resolve-nebula', nebulaMain);
     bindResolve('btn-resolve-cascade', cascadeMain);
     bindResolve('btn-resolve-neural', neuralMain);
+    bindResolve('btn-resolve-globe', globeMain);
   </script>
 </body>
 </html>

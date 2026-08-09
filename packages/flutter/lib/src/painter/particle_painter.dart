@@ -48,6 +48,9 @@ class ParticlePainter extends CustomPainter {
       } else if (variant == 'neural') {
         _drawNebulaAmbient(canvas, size, cx, cy, primaryColor);
         _drawNeuralWeb(canvas, size, primaryColor);
+      } else if (variant == 'globe') {
+        _drawNebulaAmbient(canvas, size, cx, cy, primaryColor);
+        _drawGlobeRings(canvas, size, cx, cy, primaryColor);
       }
     }
 
@@ -206,6 +209,28 @@ class ParticlePainter extends CustomPainter {
         }
       }
     }
+  }
+
+  void _drawGlobeRings(Canvas canvas, Size size, double cx, double cy, Color color) {
+    final paint = Paint()
+      ..color = color.withValues(alpha: 0.2)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    final rx = size.width * 0.32;
+    final ry = size.height * 0.12;
+
+    canvas.save();
+    canvas.translate(cx, cy);
+    canvas.rotate(-0.26); // -15 deg
+    canvas.drawOval(Rect.fromCenter(center: Offset.zero, width: rx * 2, height: ry * 2), paint);
+    canvas.restore();
+
+    canvas.save();
+    canvas.translate(cx, cy);
+    canvas.rotate(0.26); // +15 deg
+    canvas.drawOval(Rect.fromCenter(center: Offset.zero, width: rx * 2, height: ry * 4), paint);
+    canvas.restore();
   }
 
   @override

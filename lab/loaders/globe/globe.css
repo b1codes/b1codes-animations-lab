@@ -1,0 +1,79 @@
+/**
+ * @file lab/loaders/globe/globe.css
+ * @description Styling and CSS animation variables for GlobeLoader prototype.
+ */
+
+:root {
+  --globe-loader-size: 200px;
+  --globe-pulse-color: #4A90E2;
+  --globe-bg-color: transparent;
+  --globe-glow-intensity: 0.7;
+}
+
+/* Base Loader Container */
+.globe-loader-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--globe-loader-size);
+  height: var(--globe-loader-size);
+  background-color: var(--globe-bg-color);
+  position: relative;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+#globe-loader {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+
+/* Sphere Ring Guides */
+.globe-rings-layer ellipse {
+  transition: stroke 0.3s ease;
+}
+
+/* 3D Spherical Node Elements */
+.globe-particle {
+  transition: fill 0.1s linear, opacity 0.1s linear;
+  will-change: transform, opacity, fill;
+}
+
+/* Particle Mass Tier Attributes */
+.globe-particle[data-mass-tier="dust"] {
+  opacity: 0.65;
+}
+
+.globe-particle[data-mass-tier="motes"] {
+  opacity: 0.85;
+}
+
+.globe-particle[data-mass-tier="cores"] {
+  opacity: 1.0;
+  filter: drop-shadow(0 0 4px var(--globe-pulse-color));
+}
+
+/* Reduced Motion Mode Support */
+.reduced-motion-active #globe-particles-stack,
+.reduced-motion-active .globe-ambient-field,
+.reduced-motion-active .globe-rings-layer {
+  display: none !important;
+}
+
+.reduced-motion-active #globe-reduced-motion-grid {
+  display: block !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #globe-particles-stack,
+  .globe-ambient-field,
+  .globe-rings-layer {
+    display: none !important;
+  }
+
+  #globe-reduced-motion-grid {
+    display: block !important;
+  }
+}

@@ -12,3 +12,4 @@ export 'src/loaders/orbital_loader.dart';
 export 'src/loaders/nebula_loader.dart';
 export 'src/loaders/cascade_loader.dart';
 export 'src/loaders/neural_loader.dart';
+export 'src/loaders/globe_loader.dart';

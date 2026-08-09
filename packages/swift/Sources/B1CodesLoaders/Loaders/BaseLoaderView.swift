@@ -217,6 +217,11 @@ public struct BaseLoaderView: View {
                                 let px = p1.x + (p2.x - p1.x) * progress
                                 let py = p1.y + (p2.y - p1.y) * progress
                                 var pulseContext = context
+                            if edgeCount % 3 == 0 {
+                                let progress = (now * 1.2 + Double(edgeCount) * 0.25).truncatingRemainder(dividingBy: 1.0)
+                                let px = p1.x + (p2.x - p1.x) * progress
+                                let py = p1.y + (p2.y - p1.y) * progress
+                                var pulseContext = context
                                 pulseContext.opacity = alpha * 1.8
                                 let pulseRect = CGRect(x: px - 2.2, y: py - 2.2, width: 4.4, height: 4.4)
                                 pulseContext.fill(Path(ellipseIn: pulseRect), with: .color(.white))
@@ -224,6 +229,15 @@ public struct BaseLoaderView: View {
                         }
                     }
                 }
+            } else if variant == "globe" {
+                var ringContext = context
+                ringContext.opacity = 0.2
+                let rx = width * 0.32
+                let ry = height * 0.12
+                let ring1 = Path(ellipseIn: CGRect(x: cx - rx, y: cy - ry, width: rx * 2, height: ry * 2))
+                let ring2 = Path(ellipseIn: CGRect(x: cx - rx, y: cy - ry * 2, width: rx * 2, height: ry * 4))
+                ringContext.stroke(ring1, with: .color(firstColor), lineWidth: 1.0)
+                ringContext.stroke(ring2, with: .color(firstColor), lineWidth: 1.0)
             }
         }
 

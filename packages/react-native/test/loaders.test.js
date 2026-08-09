@@ -7,14 +7,16 @@ import {
   NebulaLoader,
   CascadeLoader,
   NeuralLoader,
+  GlobeLoader,
 } from '../dist/index.js';
 
 describe('@b1codes/loaders-react-native Component Suite', () => {
-  it('exports OrbitalLoader, NebulaLoader, CascadeLoader, and NeuralLoader components', () => {
+  it('exports OrbitalLoader, NebulaLoader, CascadeLoader, NeuralLoader, and GlobeLoader components', () => {
     assert.equal(typeof OrbitalLoader, 'object'); // React.memo forwardRef object
     assert.equal(typeof NebulaLoader, 'object');
     assert.equal(typeof CascadeLoader, 'object');
     assert.equal(typeof NeuralLoader, 'object');
+    assert.equal(typeof GlobeLoader, 'object');
   });
 
   it('verifies OrbitalLoader component displayName and type structure', () => {
@@ -31,6 +33,10 @@ describe('@b1codes/loaders-react-native Component Suite', () => {
 
   it('verifies NeuralLoader component displayName and type structure', () => {
     assert.equal(NeuralLoader.displayName, 'NeuralLoader');
+  });
+
+  it('verifies GlobeLoader component displayName and type structure', () => {
+    assert.equal(GlobeLoader.displayName, 'GlobeLoader');
   });
 
   it('validates loader prop interfaces and accessibilityLabel prop', () => {

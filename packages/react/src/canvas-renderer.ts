@@ -20,7 +20,7 @@ export interface RenderCanvasOptions {
   dpr: number;
   particles: ParticleRenderState[];
   backgroundColor: string;
-  variant: 'orbital' | 'nebula' | 'cascade' | 'neural';
+  variant: 'orbital' | 'nebula' | 'cascade' | 'neural' | 'globe';
   intensity: number;
   thermalGlow: ThermalGlowState;
   reducedMotion: boolean;
@@ -69,6 +69,9 @@ export function renderParticlesToCanvas(options: RenderCanvasOptions): void {
     } else if (variant === 'neural') {
       renderNebulaAmbientGlow(ctx, cx, cy, width, height, particles[0]?.color || '#4A90E2');
       renderNeuralEdges(ctx, width, height, particles, thermalGlow);
+    } else if (variant === 'globe') {
+      renderNebulaAmbientGlow(ctx, cx, cy, width, height, particles[0]?.color || '#4A90E2');
+      renderGlobeRings(ctx, cx, cy, width, height, particles[0]?.color || '#4A90E2');
     }
   }
 
@@ -329,4 +332,36 @@ function renderNeuralEdges(
 
   ctx.restore();
 }
+
+/**
+ * Draws latitude/longitude ring guides for GlobeLoader.
+ */
+function renderGlobeRings(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  width: number,
+  height: number,
+  color: string
+): void {
+  ctx.save();
+  ctx.globalAlpha = 0.2;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.0;
+  ctx.setLineDash([3, 4]);
+
+  const rx = width * 0.32;
+  const ry = height * 0.12;
+
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx, ry, -Math.PI / 12, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, rx, ry * 2, Math.PI / 12, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
 

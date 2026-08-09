@@ -105,5 +105,8 @@ final class B1CodesLoadersTests: XCTestCase {
 
         let neural = NeuralLoader(palette: palette, particleCount: 16)
         XCTAssertEqual(neural.particleCount, 16)
+
+        let globe = GlobeLoader(palette: palette, particleCount: 24)
+        XCTAssertEqual(globe.particleCount, 24)
     }
 }
