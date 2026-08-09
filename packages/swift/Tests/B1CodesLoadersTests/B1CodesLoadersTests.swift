@@ -102,5 +102,8 @@ final class B1CodesLoadersTests: XCTestCase {
         let cascade = CascadeLoader(palette: palette, gravity: 1.2, wind: 0.8)
         XCTAssertEqual(cascade.gravity, 1.2)
         XCTAssertEqual(cascade.wind, 0.8)
+
+        let neural = NeuralLoader(palette: palette, particleCount: 16)
+        XCTAssertEqual(neural.particleCount, 16)
     }
 }

@@ -113,6 +113,23 @@ void main() {
       expect(find.bySemanticsLabel('Nebula Loading'), findsOneWidget);
     });
 
+    testWidgets('NeuralLoader renders with custom palette and particleCount', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: NeuralLoader(
+              palette: [Color(0xFF4A90E2), Color(0xFF50E3C2)],
+              particleCount: 16,
+              semanticsLabel: 'Neural Loading',
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(NeuralLoader), findsOneWidget);
+      expect(find.bySemanticsLabel('Neural Loading'), findsOneWidget);
+    });
+
     testWidgets('CascadeLoader responds to B1CodesLoaderController resolve and pause methods', (WidgetTester tester) async {
       final controller = B1CodesLoaderController();
 

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuralLoader Prototype Lab — b1codes animations</title>
+  <meta name="description" content="Pure SVG/CSS/JS prototype for NeuralLoader featuring connected neural node web, signal pulse travelling, Chromatic Pulse breathing, refractive depth, and reduced motion grid." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../shared/chromatic-pulse.css" />
+  <link rel="stylesheet" href="./neural.css" />
+  <style>
+    :root {
+      --bg-dark: #0B0C10;
+      --card-bg: rgba(22, 24, 34, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #F0F4F8;
+      --text-muted: #8A99AD;
+      --accent-glow: #4A90E2;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(74, 144, 226, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 80% 80%, rgba(144, 19, 254, 0.05) 0%, transparent 50%);
+    }
+
+    header {
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(11, 12, 16, 0.8);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #FFFFFF 0%, #A0AEC0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(74, 144, 226, 0.15);
+      color: #64B5F6;
+      border: 1px solid rgba(74, 144, 226, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    main {
+      flex: 1;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 32px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .viewport-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 480px;
+      position: relative;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .loader-display-area {
+      padding: 40px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .controls-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .panel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      backdrop-filter: blur(16px);
+    }
+
+    .panel-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #E2E8F0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-group {
+      margin-bottom: 20px;
+    }
+
+    .control-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .control-value {
+      color: var(--text-main);
+      font-family: monospace;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.12);
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #4A90E2;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+    }
+
+    .palette-presets {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .palette-btn {
+      height: 36px;
+      border-radius: var(--radius-md);
+      border: 2px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: all 0.2s ease;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .palette-btn.active {
+      border-color: #FFFFFF;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+    }
+
+    .swatch-strip {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .swatch {
+      flex: 1;
+      height: 100%;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .toggle-row:last-child {
+      border-bottom: none;
+    }
+
+    .checkbox-custom {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #4A90E2;
+    }
+
+    .btn-action {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--card-border);
+      background: rgba(74, 144, 226, 0.15);
+      color: #E2E8F0;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-action:hover {
+      background: rgba(74, 144, 226, 0.3);
+      border-color: rgba(74, 144, 226, 0.5);
+    }
+
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .telemetry-item {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: var(--radius-md);
+    }
+
+    .telemetry-val {
+      font-size: 1.25rem;
+      font-weight: 700;
+      font-family: monospace;
+      color: #64B5F6;
+    }
+
+    .telemetry-lbl {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .color-indicator {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand-title">b1codes / NeuralLoader Prototype</div>
+    <span class="badge">AI Inference & Signal Pulse Loader</span>
+  </header>
+
+  <main>
+    <!-- Viewport Display Area -->
+    <section class="viewport-card" aria-label="Loader Animation Preview">
+      <div class="loader-display-area">
+        <div id="neural-container" class="neural-loader-container"></div>
+      </div>
+    </section>
+
+    <!-- Interactive Control Workbench -->
+    <aside class="controls-panel" aria-label="Interactive Controls">
+      <!-- Palette Picker Card -->
+      <section class="panel-card">
+        <h2 class="panel-title">Theme Palette</h2>
+        <div class="palette-presets">
+          <button class="palette-btn active" id="btn-palette-1" aria-label="Preset Obsidian Amber" title="Obsidian Amber">
+            <div class="swatch-strip">
+              <div class="swatch" style="background:#4A90E2"></div>
+              <div class="swatch" style="background:#50E3C2"></div>
+              <div class="swatch" style="background:#9013FE"></div>
+            </div>
+          </button>
+          <button class="palette-btn" id="btn-palette-2" aria-label="Preset Cyber Neon" title="Cyber Neon">
+            <div class="swatch-strip">
+              <div class="swatch" style="background:#FF007F"></div>
+              <div class="swatch" style="background:#7F00FF"></div>
+              <div class="swatch" style="background:#00F0FF"></div>
+            </div>
+          </button>
+          <button class="palette-btn" id="btn-palette-3" aria-label="Preset Solar Flare" title="Solar Flare">
+            <div class="swatch-strip">
+              <div class="swatch" style="background:#FF3B30"></div>
+              <div class="swatch" style="background:#FF9500"></div>
+              <div class="swatch" style="background:#FFCC00"></div>
+            </div>
+          </button>
+          <button class="palette-btn" id="btn-palette-4" aria-label="Preset Emerald Pulse" title="Emerald Pulse">
+            <div class="swatch-strip">
+              <div class="swatch" style="background:#00E676"></div>
+              <div class="swatch" style="background:#1DE9B6"></div>
+              <div class="swatch" style="background:#00E5FF"></div>
+            </div>
+          </button>
+          <button class="palette-btn" id="btn-palette-5" aria-label="Preset Monochrome Lux" title="Monochrome Lux">
+            <div class="swatch-strip">
+              <div class="swatch" style="background:#FFFFFF"></div>
+              <div class="swatch" style="background:#A0A0A0"></div>
+              <div class="swatch" style="background:#404040"></div>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <!-- Physics & System Controls -->
+      <section class="panel-card">
+        <h2 class="panel-title">Physics & Simulation</h2>
+
+        <div class="control-group">
+          <div class="control-label">
+            <label for="particle-count-slider">Node Count</label>
+            <span id="particle-count-val" class="control-value">16</span>
+          </div>
+          <input type="range" id="particle-count-slider" min="8" max="24" step="1" value="16" />
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <label for="speed-slider">Simulation Speed</label>
+            <span id="speed-val" class="control-value">1.0x</span>
+          </div>
+          <input type="range" id="speed-slider" min="0.2" max="3.0" step="0.1" value="1.0" />
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">
+            <label for="intensity-slider">Glow Intensity</label>
+            <span id="intensity-val" class="control-value">0.7</span>
+          </div>
+          <input type="range" id="intensity-slider" min="0.1" max="1.5" step="0.1" value="0.7" />
+        </div>
+
+        <div class="toggle-row">
+          <label for="depth-toggle">Refractive Depth Stack</label>
+          <input type="checkbox" id="depth-toggle" class="checkbox-custom" checked />
+        </div>
+
+        <div class="toggle-row">
+          <label for="reduced-motion-toggle">Reduced Motion Grid</label>
+          <input type="checkbox" id="reduced-motion-toggle" class="checkbox-custom" />
+        </div>
+
+        <button id="btn-resolve" class="btn-action">Resolve (Thermal Discharge)</button>
+        <button id="btn-pause" class="btn-action">Pause Simulation</button>
+      </section>
+
+      <!-- Telemetry Panel -->
+      <section class="panel-card">
+        <h2 class="panel-title">Real-Time Telemetry</h2>
+        <div class="telemetry-grid">
+          <div class="telemetry-item">
+            <div id="telemetry-fps" class="telemetry-val">60</div>
+            <div class="telemetry-lbl">Frame Rate (FPS)</div>
+          </div>
+          <div class="telemetry-item">
+            <div id="telemetry-particles" class="telemetry-val">16</div>
+            <div class="telemetry-lbl">Active Nodes</div>
+          </div>
+          <div class="telemetry-item" style="grid-column: span 2">
+            <div id="telemetry-color" class="telemetry-val">
+              <span id="pulse-swatch" class="color-indicator" style="background:#4A90E2"></span>
+              <span id="pulse-hex">#4A90E2</span>
+            </div>
+            <div class="telemetry-lbl">Chromatic Pulse State</div>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <script type="module">
+    import { NeuralLoader } from './neural.js';
+
+    const loader = new NeuralLoader({
+      container: 'neural-container',
+      particleCount: 16,
+      palette: ['#4A90E2', '#50E3C2', '#9013FE'],
+      speed: 1.0,
+      intensity: 0.7,
+      depth: true,
+      reducedMotion: false,
+    });
+
+    loader.start();
+
+    // UI Event Wiring
+    const countSlider = document.getElementById('particle-count-slider');
+    const countVal = document.getElementById('particle-count-val');
+    const telemetryParticles = document.getElementById('telemetry-particles');
+
+    countSlider.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      countVal.textContent = val;
+      telemetryParticles.textContent = val;
+      loader.setParticleCount(val);
+    });
+
+    const speedSlider = document.getElementById('speed-slider');
+    const speedVal = document.getElementById('speed-val');
+    speedSlider.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      speedVal.textContent = `${val.toFixed(1)}x`;
+      loader.setSpeed(val);
+    });
+
+    const intensitySlider = document.getElementById('intensity-slider');
+    const intensityVal = document.getElementById('intensity-val');
+    intensitySlider.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      intensityVal.textContent = val.toFixed(1);
+      loader.setIntensity(val);
+    });
+
+    const depthToggle = document.getElementById('depth-toggle');
+    depthToggle.addEventListener('change', (e) => {
+      loader.setDepth(e.target.checked);
+    });
+
+    const reducedMotionToggle = document.getElementById('reduced-motion-toggle');
+    reducedMotionToggle.addEventListener('change', (e) => {
+      loader.setReducedMotion(e.target.checked);
+    });
+
+    const btnResolve = document.getElementById('btn-resolve');
+    btnResolve.addEventListener('click', () => {
+      loader.resolve(() => {
+        setTimeout(() => loader.reset(), 1000);
+      });
+    });
+
+    const btnPause = document.getElementById('btn-pause');
+    btnPause.addEventListener('click', () => {
+      if (loader.isPaused()) {
+        loader.resume();
+        btnPause.textContent = 'Pause Simulation';
+      } else {
+        loader.pause();
+        btnPause.textContent = 'Resume Simulation';
+      }
+    });
+
+    // Preset Palettes
+    const presets = [
+      ['#4A90E2', '#50E3C2', '#9013FE'],
+      ['#FF007F', '#7F00FF', '#00F0FF'],
+      ['#FF3B30', '#FF9500', '#FFCC00'],
+      ['#00E676', '#1DE9B6', '#00E5FF'],
+      ['#FFFFFF', '#A0A0A0', '#404040'],
+    ];
+
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.getElementById(`btn-palette-${i}`);
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.palette-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        loader.setPalette(presets[i - 1]);
+      });
+    }
+
+    // Telemetry Teleport
+    const fpsVal = document.getElementById('telemetry-fps');
+    const pulseSwatch = document.getElementById('pulse-swatch');
+    const pulseHex = document.getElementById('pulse-hex');
+
+    setInterval(() => {
+      fpsVal.textContent = loader.getFPS();
+      const svgEl = document.getElementById('neural-loader');
+      if (svgEl) {
+        const currentColor = svgEl.style.getPropertyValue('--neural-pulse-color') || '#4A90E2';
+        pulseSwatch.style.backgroundColor = currentColor;
+        pulseHex.textContent = currentColor.toUpperCase();
+      }
+    }, 200);
+  </script>
+</body>
+</html>

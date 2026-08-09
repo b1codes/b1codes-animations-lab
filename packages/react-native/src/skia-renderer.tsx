@@ -41,7 +41,7 @@ export interface SkiaRendererProps {
   height: number;
   particles: ParticleRenderState[];
   backgroundColor: string;
-  variant: 'orbital' | 'nebula' | 'cascade';
+  variant: 'orbital' | 'nebula' | 'cascade' | 'neural';
   intensity: number;
   thermalGlow: ThermalGlowState;
   reducedMotion: boolean;

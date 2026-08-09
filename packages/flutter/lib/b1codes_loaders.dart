@@ -11,3 +11,4 @@ export 'src/loaders/b1codes_loader_controller.dart';
 export 'src/loaders/orbital_loader.dart';
 export 'src/loaders/nebula_loader.dart';
 export 'src/loaders/cascade_loader.dart';
+export 'src/loaders/neural_loader.dart';

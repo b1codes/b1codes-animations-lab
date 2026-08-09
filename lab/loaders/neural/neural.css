@@ -1,0 +1,89 @@
+/**
+ * @file lab/loaders/neural/neural.css
+ * @description Styling and CSS animation variables for NeuralLoader prototype.
+ */
+
+:root {
+  --neural-loader-size: 200px;
+  --neural-pulse-color: #4A90E2;
+  --neural-bg-color: transparent;
+  --neural-glow-intensity: 0.7;
+}
+
+/* Base Loader Container */
+.neural-loader-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--neural-loader-size);
+  height: var(--neural-loader-size);
+  background-color: var(--neural-bg-color);
+  position: relative;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+#neural-loader {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+
+/* Edge Network Connections */
+.neural-edge {
+  stroke: var(--neural-pulse-color);
+  stroke-linecap: round;
+  transition: stroke 0.2s ease, opacity 0.1s linear;
+}
+
+/* Signal Pulses */
+.neural-pulse-dot {
+  fill: #FFFFFF;
+  filter: drop-shadow(0 0 4px var(--neural-pulse-color));
+}
+
+/* Node Particle Elements */
+.neural-particle {
+  transition: fill 0.1s linear, opacity 0.1s linear;
+  will-change: transform, opacity, fill;
+}
+
+/* Particle Mass Tier Attributes */
+.neural-particle[data-mass-tier="dust"] {
+  opacity: 0.7;
+}
+
+.neural-particle[data-mass-tier="motes"] {
+  opacity: 0.85;
+}
+
+.neural-particle[data-mass-tier="cores"] {
+  opacity: 1.0;
+  filter: drop-shadow(0 0 4px var(--neural-pulse-color));
+}
+
+/* Reduced Motion Mode Support */
+.reduced-motion-active #neural-particles-stack,
+.reduced-motion-active #neural-edges-layer,
+.reduced-motion-active #neural-pulses-layer,
+.reduced-motion-active .neural-ambient-field {
+  display: none !important;
+}
+
+.reduced-motion-active #neural-reduced-motion-grid {
+  display: block !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #neural-particles-stack,
+  #neural-edges-layer,
+  #neural-pulses-layer,
+  .neural-ambient-field {
+    display: none !important;
+  }
+
+  #neural-reduced-motion-grid {
+    display: block !important;
+  }
+}

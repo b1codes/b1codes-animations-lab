@@ -190,6 +190,40 @@ public struct BaseLoaderView: View {
                     p.addLine(to: CGPoint(x: width * 0.9, y: floorY))
                 }
                 floorContext.stroke(linePath, with: .color(firstColor), lineWidth: 2.0)
+            } else if variant == "neural" {
+                let maxConnectDist = min(width, height) * 0.38
+                let now = Date().timeIntervalSince1970
+                var edgeCount = 0
+                for i in 0..<particles.count {
+                    for j in (i + 1)..<particles.count {
+                        let p1 = particles[i]
+                        let p2 = particles[j]
+                        let dx = p1.x - p2.x
+                        let dy = p1.y - p2.y
+                        let dist = sqrt(dx * dx + dy * dy)
+                        if dist <= maxConnectDist {
+                            edgeCount += 1
+                            let alpha = (1.0 - dist / maxConnectDist) * 0.45 * min(p1.opacity, p2.opacity)
+                            var lineContext = context
+                            lineContext.opacity = alpha
+                            let path = Path { p in
+                                p.move(to: CGPoint(x: p1.x, y: p1.y))
+                                p.addLine(to: CGPoint(x: p2.x, y: p2.y))
+                            }
+                            lineContext.stroke(path, with: .color(firstColor), lineWidth: 1.2)
+
+                            if edgeCount % 3 == 0 {
+                                let progress = (now * 1.2 + Double(edgeCount) * 0.25).truncatingRemainder(dividingBy: 1.0)
+                                let px = p1.x + (p2.x - p1.x) * progress
+                                let py = p1.y + (p2.y - p1.y) * progress
+                                var pulseContext = context
+                                pulseContext.opacity = alpha * 1.8
+                                let pulseRect = CGRect(x: px - 2.2, y: py - 2.2, width: 4.4, height: 4.4)
+                                pulseContext.fill(Path(ellipseIn: pulseRect), with: .color(.white))
+                            }
+                        }
+                    }
+                }
             }
         }
 

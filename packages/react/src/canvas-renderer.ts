@@ -20,7 +20,7 @@ export interface RenderCanvasOptions {
   dpr: number;
   particles: ParticleRenderState[];
   backgroundColor: string;
-  variant: 'orbital' | 'nebula' | 'cascade';
+  variant: 'orbital' | 'nebula' | 'cascade' | 'neural';
   intensity: number;
   thermalGlow: ThermalGlowState;
   reducedMotion: boolean;
@@ -66,6 +66,9 @@ export function renderParticlesToCanvas(options: RenderCanvasOptions): void {
       renderCascadeFloor(ctx, width, height, particles[0]?.color || '#4A90E2');
     } else if (variant === 'nebula') {
       renderNebulaAmbientGlow(ctx, cx, cy, width, height, particles[0]?.color || '#50E3C2');
+    } else if (variant === 'neural') {
+      renderNebulaAmbientGlow(ctx, cx, cy, width, height, particles[0]?.color || '#4A90E2');
+      renderNeuralEdges(ctx, width, height, particles, thermalGlow);
     }
   }
 
@@ -265,3 +268,65 @@ function renderNebulaAmbientGlow(
 
   ctx.restore();
 }
+
+/**
+ * Draws connected graph network edges & signal pulses for NeuralLoader.
+ */
+function renderNeuralEdges(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  particles: ParticleRenderState[],
+  thermalGlow: ThermalGlowState
+): void {
+  if (particles.length < 2 || thermalGlow.active) return;
+
+  ctx.save();
+  const maxConnectDist = Math.min(width, height) * 0.38;
+  const primaryColor = particles[0]?.color || '#4A90E2';
+
+  // Time-driven signal pulse progress
+  const time = (typeof performance !== 'undefined' ? performance.now() : Date.now()) * 0.0012;
+
+  let edgeCount = 0;
+
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const p1 = particles[i];
+      const p2 = particles[j];
+
+      const dx = p1.x - p2.x;
+      const dy = p1.y - p2.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist <= maxConnectDist) {
+        edgeCount++;
+        const lineAlpha = (1 - dist / maxConnectDist) * 0.45 * Math.min(p1.opacity, p2.opacity);
+        ctx.globalAlpha = lineAlpha;
+        ctx.strokeStyle = primaryColor;
+        ctx.lineWidth = 1.2;
+
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+
+        // Draw signal pulse along every 3rd connected edge
+        if (edgeCount % 3 === 0) {
+          const pulseProgress = (time + edgeCount * 0.25) % 1.0;
+          const px = p1.x + (p2.x - p1.x) * pulseProgress;
+          const py = p1.y + (p2.y - p1.y) * pulseProgress;
+
+          ctx.globalAlpha = lineAlpha * 1.8;
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(px, py, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+  }
+
+  ctx.restore();
+}
+

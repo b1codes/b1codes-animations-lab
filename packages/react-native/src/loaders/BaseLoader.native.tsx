@@ -19,7 +19,7 @@ import { SkiaParticleCanvas } from '../skia-renderer.js';
 import type { LoaderProps, LoaderRef, LoaderSize } from '../types.js';
 
 export interface BaseLoaderInternalProps extends LoaderProps {
-  variant: 'orbital' | 'nebula' | 'cascade';
+  variant: 'orbital' | 'nebula' | 'cascade' | 'neural';
   defaultParticleCount: number;
 }
 

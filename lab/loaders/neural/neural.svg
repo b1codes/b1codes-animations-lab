@@ -1,0 +1,53 @@
+<svg id="neural-loader" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Neural Network Loading Indicator">
+  <defs>
+    <!-- Multi-layer refractive depth filters -->
+    <filter id="neural-bg-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4.0" />
+    </filter>
+
+    <filter id="neural-mid-blur" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.0" />
+    </filter>
+
+    <filter id="neural-glow-filter" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5.0" result="coloredBlur" />
+      <feMerge>
+        <feMergeNode in="coloredBlur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Central ambient core gradient -->
+    <radialGradient id="neural-ambient-gradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="var(--neural-pulse-color, #4A90E2)" stop-opacity="0.3" />
+      <stop offset="50%" stop-color="var(--neural-pulse-color, #4A90E2)" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="var(--neural-pulse-color, #4A90E2)" stop-opacity="0.0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Ambient Glow Center -->
+  <g class="neural-ambient-field">
+    <circle cx="100" cy="100" r="70" fill="url(#neural-ambient-gradient)" filter="url(#neural-bg-blur)" />
+  </g>
+
+  <!-- Edge Connection Web Layer -->
+  <g id="neural-edges-layer"></g>
+
+  <!-- Signal Pulse Travelling Layer -->
+  <g id="neural-pulses-layer" filter="url(#neural-glow-filter)"></g>
+
+  <!-- Node Particle Render Stack (Refractive Depth Stack) -->
+  <g id="neural-particles-stack">
+    <!-- Background layer (Diffused) -->
+    <g id="neural-layer-background" filter="url(#neural-bg-blur)" opacity="0.5"></g>
+
+    <!-- Midground layer (Soft Focus) -->
+    <g id="neural-layer-midground" filter="url(#neural-mid-blur)" opacity="0.8"></g>
+
+    <!-- Foreground layer (Crisp & High Contrast) -->
+    <g id="neural-layer-foreground" filter="url(#neural-glow-filter)"></g>
+  </g>
+
+  <!-- Reduced Motion Static Grid Fallback -->
+  <g id="neural-reduced-motion-grid" display="none"></g>
+</svg>

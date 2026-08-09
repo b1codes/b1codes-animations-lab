@@ -8,3 +8,4 @@ export * from './types.js';
 export { OrbitalLoader } from './loaders/OrbitalLoader.js';
 export { NebulaLoader } from './loaders/NebulaLoader.js';
 export { CascadeLoader } from './loaders/CascadeLoader.js';
+export { NeuralLoader } from './loaders/NeuralLoader.js';

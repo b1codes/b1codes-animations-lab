@@ -95,6 +95,13 @@ export interface CascadeLoaderProps extends LoaderProps {
   wind?: number;
 }
 
+export interface NeuralLoaderProps extends LoaderProps {
+  /**
+   * Total node count for neural loader (defaults to 16, recommended range 12–24).
+   */
+  particleCount?: number;
+}
+
 export interface LoaderRef {
   /**
    * Triggers the Thermal Glow exit discharge sequence (~350ms),

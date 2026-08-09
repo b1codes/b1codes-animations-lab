@@ -45,6 +45,9 @@ class ParticlePainter extends CustomPainter {
         _drawCascadeFloor(canvas, size, primaryColor);
       } else if (variant == 'nebula') {
         _drawNebulaAmbient(canvas, size, cx, cy, primaryColor);
+      } else if (variant == 'neural') {
+        _drawNebulaAmbient(canvas, size, cx, cy, primaryColor);
+        _drawNeuralWeb(canvas, size, primaryColor);
       }
     }
 
@@ -161,6 +164,48 @@ class ParticlePainter extends CustomPainter {
       ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: radius));
 
     canvas.drawCircle(Offset(cx, cy), radius, paint);
+  }
+
+  void _drawNeuralWeb(Canvas canvas, Size size, Color color) {
+    if (particles.length < 2) return;
+
+    final maxConnectDist = math.min(size.width, size.height) * 0.38;
+    final nowSec = DateTime.now().millisecondsSinceEpoch / 1000.0;
+    int edgeCount = 0;
+
+    for (int i = 0; i < particles.length; i++) {
+      for (int j = i + 1; j < particles.length; j++) {
+        final p1 = particles[i];
+        final p2 = particles[j];
+
+        final dx = p1.x - p2.x;
+        final dy = p1.y - p2.y;
+        final dist = math.sqrt(dx * dx + dy * dy);
+
+        if (dist <= maxConnectDist) {
+          edgeCount++;
+          final lineAlpha = (1.0 - dist / maxConnectDist) * 0.45 * math.min(p1.opacity, p2.opacity);
+          final linePaint = Paint()
+            ..color = color.withValues(alpha: lineAlpha)
+            ..strokeWidth = 1.2
+            ..style = PaintingStyle.stroke;
+
+          canvas.drawLine(Offset(p1.x, p1.y), Offset(p2.x, p2.y), linePaint);
+
+          if (edgeCount % 3 == 0) {
+            final pulseProgress = (nowSec * 1.2 + edgeCount * 0.25) % 1.0;
+            final px = p1.x + (p2.x - p1.x) * pulseProgress;
+            final py = p1.y + (p2.y - p1.y) * pulseProgress;
+
+            final pulsePaint = Paint()
+              ..color = Colors.white.withValues(alpha: lineAlpha * 1.8)
+              ..style = PaintingStyle.fill;
+
+            canvas.drawCircle(Offset(px, py), 2.2, pulsePaint);
+          }
+        }
+      }
+    }
   }
 
   @override
