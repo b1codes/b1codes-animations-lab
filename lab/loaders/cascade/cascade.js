@@ -19,95 +19,70 @@ import {
   rgbToHex,
 } from '../../shared/particle-engine.js';
 
-export interface CascadeLoaderOptions {
-  /** Target SVG element ID or HTML container element */
-  container: string | HTMLElement;
-  /** Configurable particle count (20 to 40, default 30) */
-  particleCount?: number;
-  /** Consuming app color palette (minimum 2 hex colors) */
-  palette?: string[];
-  /** Animation speed multiplier (default 1.0) */
-  speed?: number;
-  /** Gravity acceleration multiplier (default 1.0) */
-  gravity?: number;
-  /** Horizontal wind drift multiplier (default 1.0) */
-  wind?: number;
-  /** Particle size & glow intensity multiplier (default 0.7) */
-  intensity?: number;
-  /** Enable multi-layer refractive depth (default true) */
-  depth?: boolean;
-  /** Enable reduced motion static grid fallback (default false) */
-  reducedMotion?: boolean;
-  /** SVG viewBox width (default 200) */
-  width?: number;
-  /** SVG viewBox height (default 300) */
-  height?: number;
-  /** Optional deterministic random seed */
-  seed?: number;
-}
-
-interface CascadeParticle {
-  id: number;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  massTier: typeof PARTICLE_MASS_TIERS.CORES;
-  depthLayer: typeof REFRACTIVE_DEPTH_LAYERS.FOREGROUND;
-  phaseOffset: number;
-  windOffset: number;
-  speedStagger: number;
-  isPooling: boolean;
-  poolTimerMs: number;
-}
+/**
+ * @typedef {Object} CascadeLoaderOptions
+ * @property {string | HTMLElement} container - Target SVG element ID or HTML container element
+ * @property {number} [particleCount=30] - Configurable particle count (20 to 40)
+ * @property {string[]} [palette] - Consuming app color palette (minimum 2 hex colors)
+ * @property {number} [speed=1.0] - Animation speed multiplier
+ * @property {number} [gravity=1.0] - Gravity acceleration multiplier
+ * @property {number} [wind=1.0] - Horizontal wind drift multiplier
+ * @property {number} [intensity=0.7] - Particle size & glow intensity multiplier
+ * @property {boolean} [depth=true] - Enable multi-layer refractive depth
+ * @property {boolean} [reducedMotion=false] - Enable reduced motion static grid fallback
+ * @property {number} [width=200] - SVG viewBox width
+ * @property {number} [height=300] - SVG viewBox height
+ * @property {number} [seed] - Optional deterministic random seed
+ */
 
 class PRNG {
-  private state: number;
-
-  constructor(seed: number) {
+  constructor(seed) {
     this.state = seed >>> 0;
   }
 
-  next(): number {
+  next() {
     let t = (this.state += 0x6d2b79f5);
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   }
 
-  range(min: number, max: number): number {
+  range(min, max) {
     return min + this.next() * (max - min);
   }
 }
 
 export class CascadeLoader {
-  private containerEl: HTMLElement | null = null;
-  private svgEl: SVGElement | null = null;
-  private bgLayerEl: SVGGElement | null = null;
-  private midLayerEl: SVGGElement | null = null;
-  private fgLayerEl: SVGGElement | null = null;
-  private reducedMotionGridEl: SVGGElement | null = null;
+  containerEl = null;
+  svgEl = null;
+  bgLayerEl = null;
+  midLayerEl = null;
+  fgLayerEl = null;
+  reducedMotionGridEl = null;
 
-  private config: Required<Omit<CascadeLoaderOptions, 'container' | 'seed'>> & { seed?: number };
-  private particles: CascadeParticle[] = [];
-  private chromaticPulse: ChromaticPulse;
-  private prng: PRNG;
+  config = null;
+  particles = [];
+  chromaticPulse = null;
+  prng = null;
 
-  private animFrameId: number | null = null;
-  private lastTimestamp = 0;
-  private elapsedMs = 0;
-  private isRunning = false;
-  private isPausedState = false;
+  animFrameId = null;
+  lastTimestamp = 0;
+  elapsedMs = 0;
+  isRunning = false;
+  isPausedState = false;
 
-  private fpsFrameCount = 0;
-  private fpsLastCheckTime = 0;
-  private currentFPS = 60;
+  fpsFrameCount = 0;
+  fpsLastCheckTime = 0;
+  currentFPS = 60;
 
-  private isThermalActive = false;
-  private thermalStartTime = 0;
-  private onDismissCallback?: () => void;
+  isThermalActive = false;
+  thermalStartTime = 0;
+  onDismissCallback = undefined;
 
-  constructor(options: CascadeLoaderOptions) {
+  /**
+   * @param {CascadeLoaderOptions} options
+   */
+  constructor(options) {
     if (typeof options.container === 'string') {
       this.containerEl = document.getElementById(options.container);
     } else {
@@ -141,7 +116,7 @@ export class CascadeLoader {
     this.renderInitialDOM();
   }
 
-  private setupDOM(): void {
+  setupDOM() {
     if (!this.containerEl) return;
 
     this.svgEl = this.containerEl.querySelector('#cascade-loader') || this.containerEl.querySelector('svg');
@@ -171,8 +146,8 @@ export class CascadeLoader {
             </linearGradient>
           </defs>
           <g class="cascade-floor-surface">
-            <rect class="floor-glow-bar" x="15" y="252" width="${this.config.width - 30}" height="4" rx="2" fill="url(#cascade-floor-glow-gradient)" filter="url(#cascade-glow-filter)" />
-            <line class="floor-baseline" x1="20" y1="254" x2="${this.config.width - 20}" y2="254" stroke="var(--cascade-pulse-color, #4A90E2)" stroke-opacity="0.25" stroke-dasharray="3 3" />
+            <rect class="floor-glow-bar" x="15" y="${this.config.height - 48}" width="${this.config.width - 30}" height="4" rx="2" fill="url(#cascade-floor-glow-gradient)" filter="url(#cascade-glow-filter)" />
+            <line class="floor-baseline" x1="20" y1="${this.config.height - 46}" x2="${this.config.width - 20}" y2="${this.config.height - 46}" stroke="var(--cascade-pulse-color, #4A90E2)" stroke-opacity="0.25" stroke-dasharray="3 3" />
           </g>
           <g id="cascade-particles-stack">
             <g id="cascade-layer-background" filter="url(#cascade-bg-blur)" opacity="0.45"></g>
@@ -182,7 +157,7 @@ export class CascadeLoader {
           <g id="cascade-reduced-motion-grid" display="none"></g>
         </svg>
       `;
-      this.svgEl = this.containerEl.querySelector('#cascade-loader') as SVGElement;
+      this.svgEl = this.containerEl.querySelector('#cascade-loader');
     }
 
     this.bgLayerEl = this.svgEl.querySelector('#cascade-layer-background');
@@ -198,7 +173,7 @@ export class CascadeLoader {
   /**
    * Initializes cascading particles with vertical position staggers along descent path.
    */
-  private initCascadeParticles(): void {
+  initCascadeParticles() {
     const { particleCount, width, height, depth } = this.config;
     const massTiers = [
       PARTICLE_MASS_TIERS.CORES,
@@ -242,7 +217,7 @@ export class CascadeLoader {
     }
   }
 
-  private respawnParticle(p: CascadeParticle): void {
+  respawnParticle(p) {
     const { width } = this.config;
     p.x = this.prng.range(15, width - 15);
     p.y = this.prng.range(-35, -5);
@@ -253,7 +228,7 @@ export class CascadeLoader {
     p.speedStagger = 0.85 + this.prng.next() * 0.35;
   }
 
-  private renderInitialDOM(): void {
+  renderInitialDOM() {
     if (!this.bgLayerEl || !this.midLayerEl || !this.fgLayerEl || !this.reducedMotionGridEl) return;
 
     this.bgLayerEl.innerHTML = '';
@@ -306,7 +281,7 @@ export class CascadeLoader {
    * Main render frame step: updates gravity acceleration, wind sway, floor pooling deceleration,
    * thermal dissolve & respawn sequences.
    */
-  private updateRenderFrame(): void {
+  updateRenderFrame() {
     if (!this.svgEl) return;
 
     const pulseState = this.chromaticPulse.evaluateAt(this.elapsedMs);
@@ -344,7 +319,7 @@ export class CascadeLoader {
       const easedProgress = 1 - Math.pow(1 - progress, 4);
 
       this.particles.forEach((p) => {
-        const circleEl = this.svgEl?.querySelector(`#cascade-particle-${p.id}`) as SVGCircleElement | null;
+        const circleEl = this.svgEl?.querySelector(`#cascade-particle-${p.id}`);
         if (!circleEl) return;
 
         const dx = p.x - cx;
@@ -368,9 +343,13 @@ export class CascadeLoader {
       return;
     }
 
+    const dtSec = 0.016 * this.config.speed;
+    const gravityAcc = 250 * this.config.gravity;
+    const floorY = this.config.height - 46;
+
     for (let i = 0; i < this.particles.length; i++) {
       const p = this.particles[i];
-      const circleEl = this.svgEl.querySelector(`#cascade-particle-${p.id}`) as SVGCircleElement | null;
+      const circleEl = this.svgEl.querySelector(`#cascade-particle-${p.id}`);
       if (!circleEl) continue;
 
       if (p.isPooling) {
@@ -447,7 +426,7 @@ export class CascadeLoader {
   /**
    * Animation frame loop tick.
    */
-  private tick = (timestamp: number): void => {
+  tick = (timestamp) => {
     if (!this.isRunning) return;
 
     if (!this.lastTimestamp) this.lastTimestamp = timestamp;
@@ -474,7 +453,7 @@ export class CascadeLoader {
   /**
    * Starts the animation loop.
    */
-  public start(): void {
+  start() {
     if (this.isRunning) return;
     this.isRunning = true;
     this.isPausedState = false;
@@ -485,7 +464,7 @@ export class CascadeLoader {
   /**
    * Stops the animation loop.
    */
-  public stop(): void {
+  stop() {
     this.isRunning = false;
     if (this.animFrameId !== null) {
       cancelAnimationFrame(this.animFrameId);
@@ -493,26 +472,26 @@ export class CascadeLoader {
     }
   }
 
-  public pause(): void {
+  pause() {
     this.isPausedState = true;
   }
 
-  public resume(): void {
+  resume() {
     this.isPausedState = false;
   }
 
-  public isPaused(): boolean {
+  isPaused() {
     return this.isPausedState;
   }
 
-  public setPalette(palette: string[]): void {
+  setPalette(palette) {
     if (!palette || palette.length < 2) return;
     this.config.palette = palette;
     this.chromaticPulse.updateConfig({ palette });
     this.renderInitialDOM();
   }
 
-  public setParticleCount(count: number): void {
+  setParticleCount(count) {
     const clamped = Math.max(12, Math.min(50, count));
     if (clamped === this.config.particleCount) return;
     this.config.particleCount = clamped;
@@ -520,30 +499,30 @@ export class CascadeLoader {
     this.renderInitialDOM();
   }
 
-  public setSpeed(speed: number): void {
+  setSpeed(speed) {
     this.config.speed = Math.max(0.1, Math.min(5.0, speed));
   }
 
-  public setGravity(gravity: number): void {
+  setGravity(gravity) {
     this.config.gravity = Math.max(0.1, Math.min(4.0, gravity));
   }
 
-  public setWind(wind: number): void {
+  setWind(wind) {
     this.config.wind = Math.max(0.0, Math.min(4.0, wind));
   }
 
-  public setIntensity(intensity: number): void {
+  setIntensity(intensity) {
     this.config.intensity = Math.max(0.1, Math.min(1.5, intensity));
   }
 
-  public setDepth(enabled: boolean): void {
+  setDepth(enabled) {
     if (enabled === this.config.depth) return;
     this.config.depth = enabled;
     this.initCascadeParticles();
     this.renderInitialDOM();
   }
 
-  public setReducedMotion(enabled: boolean): void {
+  setReducedMotion(enabled) {
     this.config.reducedMotion = enabled;
     this.chromaticPulse.updateConfig({ reducedMotion: enabled });
     if (this.containerEl) {
@@ -556,7 +535,7 @@ export class CascadeLoader {
     this.updateRenderFrame();
   }
 
-  public getFPS(): number {
+  getFPS() {
     return this.currentFPS;
   }
 
@@ -564,7 +543,7 @@ export class CascadeLoader {
    * Triggers Thermal Glow exit discharge sequence (~350ms),
    * accelerating particles outward before dissolving and firing onDismiss.
    */
-  public resolve(onDismiss?: () => void): void {
+  resolve(onDismiss) {
     if (this.isThermalActive) return;
     this.onDismissCallback = onDismiss;
 
@@ -584,7 +563,7 @@ export class CascadeLoader {
   /**
    * Resets loader simulation to initial state.
    */
-  public reset(): void {
+  reset() {
     this.stop();
     this.isThermalActive = false;
     this.thermalStartTime = 0;
@@ -598,7 +577,7 @@ export class CascadeLoader {
     this.start();
   }
 
-  public destroy(): void {
+  destroy() {
     this.stop();
     if (this.containerEl) {
       this.containerEl.innerHTML = '';

@@ -26,6 +26,8 @@ export const THERMAL_GLOW_EXCITATION_DURATION = 50;
 
 export const THERMAL_GLOW_DISSIPATION_DURATION = 300;
 
+export const THERMAL_GLOW_TOTAL_DURATION = 350;
+
 export const THERMAL_GLOW_SPECTRUM = ['#FF3B30', '#FF9500'];
 
 export const INTERACTION_EASE = 'cubic-bezier(0.25, 1, 0.5, 1)';

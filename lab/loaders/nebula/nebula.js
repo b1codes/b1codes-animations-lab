@@ -21,57 +21,33 @@ import {
   rgbToHex,
 } from '../../shared/particle-engine.js';
 
-export interface NebulaLoaderOptions {
-  /** Target SVG element ID or HTML container element */
-  container: string | HTMLElement;
-  /** Configurable particle count (30 to 60, default 45) */
-  particleCount?: number;
-  /** Consuming app color palette (minimum 2 hex colors) */
-  palette?: string[];
-  /** Animation speed multiplier (default 1.0) */
-  speed?: number;
-  /** Particle size & glow intensity multiplier (default 0.7) */
-  intensity?: number;
-  /** Enable multi-layer refractive depth (default true) */
-  depth?: boolean;
-  /** Enable reduced motion static grid fallback (default false) */
-  reducedMotion?: boolean;
-  /** SVG viewBox width (default 300) */
-  width?: number;
-  /** SVG viewBox height (default 300) */
-  height?: number;
-  /** Optional deterministic random seed */
-  seed?: number;
-}
-
-interface NebulaParticle {
-  id: number;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  massTier: typeof PARTICLE_MASS_TIERS.CORES;
-  depthLayer: typeof REFRACTIVE_DEPTH_LAYERS.FOREGROUND;
-  phaseOffset: number;
-  noiseSeedX: number;
-  noiseSeedY: number;
-}
+/**
+ * @typedef {Object} NebulaLoaderOptions
+ * @property {string | HTMLElement} container - Target SVG element ID or HTML container element
+ * @property {number} [particleCount=45] - Configurable particle count (30 to 60)
+ * @property {string[]} [palette] - Consuming app color palette (minimum 2 hex colors)
+ * @property {number} [speed=1.0] - Animation speed multiplier
+ * @property {number} [intensity=0.7] - Particle size & glow intensity multiplier
+ * @property {boolean} [depth=true] - Enable multi-layer refractive depth
+ * @property {boolean} [reducedMotion=false] - Enable reduced motion static grid fallback
+ * @property {number} [width=300] - SVG viewBox width
+ * @property {number} [height=300] - SVG viewBox height
+ * @property {number} [seed] - Optional deterministic random seed
+ */
 
 class PRNG {
-  private state: number;
-
-  constructor(seed: number) {
+  constructor(seed) {
     this.state = seed >>> 0;
   }
 
-  next(): number {
+  next() {
     let t = (this.state += 0x6d2b79f5);
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   }
 
-  range(min: number, max: number): number {
+  range(min, max) {
     return min + this.next() * (max - min);
   }
 }
@@ -80,10 +56,10 @@ class PRNG {
  * Fast 2D Simplex/Perlin noise approximation generator.
  */
 class PerlinNoise2D {
-  private perm: number[] = [];
+  perm = [];
 
-  constructor(prng: PRNG) {
-    const p: number[] = [];
+  constructor(prng) {
+    const p = [];
     for (let i = 0; i < 256; i++) p[i] = i;
     for (let i = 255; i > 0; i--) {
       const j = Math.floor(prng.next() * (i + 1));
@@ -94,22 +70,22 @@ class PerlinNoise2D {
     this.perm = p.concat(p);
   }
 
-  private fade(t: number): number {
+  fade(t) {
     return t * t * t * (t * (t * 6 - 15) + 10);
   }
 
-  private lerp(t: number, a: number, b: number): number {
+  lerp(t, a, b) {
     return a + t * (b - a);
   }
 
-  private grad(hash: number, x: number, y: number): number {
+  grad(hash, x, y) {
     const h = hash & 7;
     const u = h < 4 ? x : y;
     const v = h < 4 ? y : x;
     return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
   }
 
-  public noise(x: number, y: number): number {
+  noise(x, y) {
     const X = Math.floor(x) & 255;
     const Y = Math.floor(y) & 255;
 
@@ -135,34 +111,37 @@ class PerlinNoise2D {
 }
 
 export class NebulaLoader {
-  private containerEl: HTMLElement | null = null;
-  private svgEl: SVGElement | null = null;
-  private bgLayerEl: SVGGElement | null = null;
-  private midLayerEl: SVGGElement | null = null;
-  private fgLayerEl: SVGGElement | null = null;
-  private reducedMotionGridEl: SVGGElement | null = null;
+  containerEl = null;
+  svgEl = null;
+  bgLayerEl = null;
+  midLayerEl = null;
+  fgLayerEl = null;
+  reducedMotionGridEl = null;
 
-  private config: Required<Omit<NebulaLoaderOptions, 'container' | 'seed'>> & { seed?: number };
-  private particles: NebulaParticle[] = [];
-  private chromaticPulse: ChromaticPulse;
-  private prng: PRNG;
-  private perlin: PerlinNoise2D;
+  config = null;
+  particles = [];
+  chromaticPulse = null;
+  prng = null;
+  perlin = null;
 
-  private animFrameId: number | null = null;
-  private lastTimestamp = 0;
-  private elapsedMs = 0;
-  private isRunning = false;
-  private isPausedState = false;
+  animFrameId = null;
+  lastTimestamp = 0;
+  elapsedMs = 0;
+  isRunning = false;
+  isPausedState = false;
 
-  private fpsFrameCount = 0;
-  private fpsLastCheckTime = 0;
-  private currentFPS = 60;
+  fpsFrameCount = 0;
+  fpsLastCheckTime = 0;
+  currentFPS = 60;
 
-  private isThermalActive = false;
-  private thermalStartTime = 0;
-  private onDismissCallback?: () => void;
+  isThermalActive = false;
+  thermalStartTime = 0;
+  onDismissCallback = undefined;
 
-  constructor(options: NebulaLoaderOptions) {
+  /**
+   * @param {NebulaLoaderOptions} options
+   */
+  constructor(options) {
     if (typeof options.container === 'string') {
       this.containerEl = document.getElementById(options.container);
     } else {
@@ -195,7 +174,7 @@ export class NebulaLoader {
     this.renderInitialDOM();
   }
 
-  private setupDOM(): void {
+  setupDOM() {
     if (!this.containerEl) return;
 
     this.svgEl = this.containerEl.querySelector('#nebula-loader') || this.containerEl.querySelector('svg');
@@ -233,7 +212,7 @@ export class NebulaLoader {
           <g id="nebula-reduced-motion-grid" display="none"></g>
         </svg>
       `;
-      this.svgEl = this.containerEl.querySelector('#nebula-loader') as SVGElement;
+      this.svgEl = this.containerEl.querySelector('#nebula-loader');
     }
 
     this.bgLayerEl = this.svgEl.querySelector('#nebula-layer-background');
@@ -249,7 +228,7 @@ export class NebulaLoader {
   /**
    * Initializes nebula cloud particle positions across 3 size tiers (dust, motes, cores).
    */
-  private initNebulaParticles(): void {
+  initNebulaParticles() {
     const { particleCount, width, height, depth } = this.config;
     const massTiers = [
       PARTICLE_MASS_TIERS.CORES,
@@ -295,7 +274,7 @@ export class NebulaLoader {
     }
   }
 
-  private renderInitialDOM(): void {
+  renderInitialDOM() {
     if (!this.bgLayerEl || !this.midLayerEl || !this.fgLayerEl || !this.reducedMotionGridEl) return;
 
     this.bgLayerEl.innerHTML = '';
@@ -348,7 +327,7 @@ export class NebulaLoader {
    * Main render tick step: computes Perlin noise drift, inter-particle attraction/repulsion,
    * density breathing cycle, and SVG position updates.
    */
-  private updateRenderFrame(): void {
+  updateRenderFrame() {
     if (!this.svgEl) return;
 
     const pulseState = this.chromaticPulse.evaluateAt(this.elapsedMs);
@@ -386,7 +365,7 @@ export class NebulaLoader {
       const easedProgress = 1 - Math.pow(1 - progress, 4);
 
       this.particles.forEach((p) => {
-        const circleEl = this.svgEl?.querySelector(`#nebula-particle-${p.id}`) as SVGCircleElement | null;
+        const circleEl = this.svgEl?.querySelector(`#nebula-particle-${p.id}`);
         if (!circleEl) return;
 
         const dx = p.x - cx;
@@ -472,7 +451,7 @@ export class NebulaLoader {
       p.y += p.vy * dtSec;
 
       // Update SVG DOM elements
-      const circleEl = this.svgEl.querySelector(`#nebula-particle-${p.id}`) as SVGCircleElement | null;
+      const circleEl = this.svgEl.querySelector(`#nebula-particle-${p.id}`);
       if (!circleEl) continue;
 
       const baseScale = p.massTier.sizeRatio * this.config.intensity;
@@ -492,7 +471,7 @@ export class NebulaLoader {
   /**
    * Animation frame loop tick.
    */
-  private tick = (timestamp: number): void => {
+  tick = (timestamp) => {
     if (!this.isRunning) return;
 
     if (!this.lastTimestamp) this.lastTimestamp = timestamp;
@@ -519,7 +498,7 @@ export class NebulaLoader {
   /**
    * Starts the animation loop.
    */
-  public start(): void {
+  start() {
     if (this.isRunning) return;
     this.isRunning = true;
     this.isPausedState = false;
@@ -530,7 +509,7 @@ export class NebulaLoader {
   /**
    * Stops the animation loop.
    */
-  public stop(): void {
+  stop() {
     this.isRunning = false;
     if (this.animFrameId !== null) {
       cancelAnimationFrame(this.animFrameId);
@@ -538,26 +517,26 @@ export class NebulaLoader {
     }
   }
 
-  public pause(): void {
+  pause() {
     this.isPausedState = true;
   }
 
-  public resume(): void {
+  resume() {
     this.isPausedState = false;
   }
 
-  public isPaused(): boolean {
+  isPaused() {
     return this.isPausedState;
   }
 
-  public setPalette(palette: string[]): void {
+  setPalette(palette) {
     if (!palette || palette.length < 2) return;
     this.config.palette = palette;
     this.chromaticPulse.updateConfig({ palette });
     this.renderInitialDOM();
   }
 
-  public setParticleCount(count: number): void {
+  setParticleCount(count) {
     const clamped = Math.max(20, Math.min(80, count));
     if (clamped === this.config.particleCount) return;
     this.config.particleCount = clamped;
@@ -565,22 +544,22 @@ export class NebulaLoader {
     this.renderInitialDOM();
   }
 
-  public setSpeed(speed: number): void {
+  setSpeed(speed) {
     this.config.speed = Math.max(0.1, Math.min(5.0, speed));
   }
 
-  public setIntensity(intensity: number): void {
+  setIntensity(intensity) {
     this.config.intensity = Math.max(0.1, Math.min(1.5, intensity));
   }
 
-  public setDepth(enabled: boolean): void {
+  setDepth(enabled) {
     if (enabled === this.config.depth) return;
     this.config.depth = enabled;
     this.initNebulaParticles();
     this.renderInitialDOM();
   }
 
-  public setReducedMotion(enabled: boolean): void {
+  setReducedMotion(enabled) {
     this.config.reducedMotion = enabled;
     this.chromaticPulse.updateConfig({ reducedMotion: enabled });
     if (this.containerEl) {
@@ -593,7 +572,7 @@ export class NebulaLoader {
     this.updateRenderFrame();
   }
 
-  public getFPS(): number {
+  getFPS() {
     return this.currentFPS;
   }
 
@@ -601,7 +580,7 @@ export class NebulaLoader {
    * Triggers Thermal Glow exit discharge sequence (~350ms),
    * accelerating particles outward before dissolving and firing onDismiss.
    */
-  public resolve(onDismiss?: () => void): void {
+  resolve(onDismiss) {
     if (this.isThermalActive) return;
     this.onDismissCallback = onDismiss;
 
@@ -621,7 +600,7 @@ export class NebulaLoader {
   /**
    * Resets loader simulation to initial state.
    */
-  public reset(): void {
+  reset() {
     this.stop();
     this.isThermalActive = false;
     this.thermalStartTime = 0;
@@ -635,7 +614,7 @@ export class NebulaLoader {
     this.start();
   }
 
-  public destroy(): void {
+  destroy() {
     this.stop();
     if (this.containerEl) {
       this.containerEl.innerHTML = '';

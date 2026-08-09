@@ -20,92 +20,69 @@ import {
   rgbToHex,
 } from '../../shared/particle-engine.js';
 
-export interface OrbitalLoaderOptions {
-  /** Target SVG element ID or HTML container element */
-  container: string | HTMLElement;
-  /** Configurable particle count (12 to 24, default 18) */
-  particleCount?: number;
-  /** Consuming app color palette (minimum 2 hex colors) */
-  palette?: string[];
-  /** Animation speed multiplier (default 1.0) */
-  speed?: number;
-  /** Particle size & glow intensity multiplier (default 0.7) */
-  intensity?: number;
-  /** Enable multi-layer refractive depth (default true) */
-  depth?: boolean;
-  /** Enable reduced motion static grid fallback (default false) */
-  reducedMotion?: boolean;
-  /** SVG viewBox width (default 200) */
-  width?: number;
-  /** SVG viewBox height (default 200) */
-  height?: number;
-  /** Optional deterministic random seed */
-  seed?: number;
-}
-
-interface OrbitalParticle {
-  id: number;
-  massTier: typeof PARTICLE_MASS_TIERS.CORES;
-  depthLayer: typeof REFRACTIVE_DEPTH_LAYERS.FOREGROUND;
-  semiMajorA: number;
-  semiMinorB: number;
-  ellipseRotation: number;
-  angularVelocity: number;
-  orbitalPhase: number;
-  shimmerOffset: number;
-  isPerturbed: boolean;
-  perturbTimerMs: number;
-  perturbOffsetR: number;
-}
+/**
+ * @typedef {Object} OrbitalLoaderOptions
+ * @property {string | HTMLElement} container - Target SVG element ID or HTML container element
+ * @property {number} [particleCount=18] - Configurable particle count (12 to 24)
+ * @property {string[]} [palette] - Consuming app color palette (minimum 2 hex colors)
+ * @property {number} [speed=1.0] - Animation speed multiplier
+ * @property {number} [intensity=0.7] - Particle size & glow intensity multiplier
+ * @property {boolean} [depth=true] - Enable multi-layer refractive depth
+ * @property {boolean} [reducedMotion=false] - Enable reduced motion static grid fallback
+ * @property {number} [width=200] - SVG viewBox width
+ * @property {number} [height=200] - SVG viewBox height
+ * @property {number} [seed] - Optional deterministic random seed
+ */
 
 class PRNG {
-  private state: number;
-
-  constructor(seed: number) {
+  constructor(seed) {
     this.state = seed >>> 0;
   }
 
-  next(): number {
+  next() {
     let t = (this.state += 0x6d2b79f5);
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   }
 
-  range(min: number, max: number): number {
+  range(min, max) {
     return min + this.next() * (max - min);
   }
 }
 
 export class OrbitalLoader {
-  private containerEl: HTMLElement | null = null;
-  private svgEl: SVGElement | null = null;
-  private bgLayerEl: SVGGElement | null = null;
-  private midLayerEl: SVGGElement | null = null;
-  private fgLayerEl: SVGGElement | null = null;
-  private reducedMotionGridEl: SVGGElement | null = null;
+  containerEl = null;
+  svgEl = null;
+  bgLayerEl = null;
+  midLayerEl = null;
+  fgLayerEl = null;
+  reducedMotionGridEl = null;
 
-  private config: Required<Omit<OrbitalLoaderOptions, 'container' | 'seed'>> & { seed?: number };
-  private particles: OrbitalParticle[] = [];
-  private chromaticPulse: ChromaticPulse;
-  private prng: PRNG;
+  config = null;
+  particles = [];
+  chromaticPulse = null;
+  prng = null;
 
-  private animFrameId: number | null = null;
-  private lastTimestamp = 0;
-  private elapsedMs = 0;
-  private isRunning = false;
-  private isPausedState = false;
+  animFrameId = null;
+  lastTimestamp = 0;
+  elapsedMs = 0;
+  isRunning = false;
+  isPausedState = false;
 
-  private nextPerturbCountdownMs = 2500;
-  private fpsFrameCount = 0;
-  private fpsLastCheckTime = 0;
-  private currentFPS = 60;
+  nextPerturbCountdownMs = 2500;
+  fpsFrameCount = 0;
+  fpsLastCheckTime = 0;
+  currentFPS = 60;
 
-  private isThermalActive = false;
-  private thermalStartTime = 0;
-  private onDismissCallback?: () => void;
+  isThermalActive = false;
+  thermalStartTime = 0;
+  onDismissCallback = undefined;
 
-  constructor(options: OrbitalLoaderOptions) {
+  /**
+   * @param {OrbitalLoaderOptions} options
+   */
+  constructor(options) {
     if (typeof options.container === 'string') {
       this.containerEl = document.getElementById(options.container);
     } else {
@@ -137,7 +114,7 @@ export class OrbitalLoader {
     this.renderInitialDOM();
   }
 
-  private setupDOM(): void {
+  setupDOM() {
     if (!this.containerEl) return;
 
     this.svgEl = this.containerEl.querySelector('#orbital-loader') || this.containerEl.querySelector('svg');
@@ -181,7 +158,7 @@ export class OrbitalLoader {
           <g id="orbital-reduced-motion-grid" display="none"></g>
         </svg>
       `;
-      this.svgEl = this.containerEl.querySelector('#orbital-loader') as SVGElement;
+      this.svgEl = this.containerEl.querySelector('#orbital-loader');
     }
 
     this.bgLayerEl = this.svgEl.querySelector('#orbital-layer-background');
@@ -198,7 +175,7 @@ export class OrbitalLoader {
    * Initializes Keplerian particle orbital parameters.
    * Particles follow Kepler's Law: closer particles orbit faster, farther ones drift slower.
    */
-  private initOrbitalParticles(): void {
+  initOrbitalParticles() {
     const { particleCount, width, depth } = this.config;
     const massTiers = [
       PARTICLE_MASS_TIERS.CORES,
@@ -259,7 +236,7 @@ export class OrbitalLoader {
     }
   }
 
-  private renderInitialDOM(): void {
+  renderInitialDOM() {
     if (!this.bgLayerEl || !this.midLayerEl || !this.fgLayerEl || !this.reducedMotionGridEl) return;
 
     this.bgLayerEl.innerHTML = '';
@@ -311,7 +288,7 @@ export class OrbitalLoader {
   /**
    * Main render loop step executing frame calculations.
    */
-  private updateRenderFrame(): void {
+  updateRenderFrame() {
     if (!this.svgEl) return;
 
     const pulseState = this.chromaticPulse.evaluateAt(this.elapsedMs);
@@ -349,7 +326,7 @@ export class OrbitalLoader {
       const easedProgress = 1 - Math.pow(1 - progress, 4);
 
       this.particles.forEach((p) => {
-        const circleEl = this.svgEl?.querySelector(`#orbital-particle-${p.id}`) as SVGCircleElement | null;
+        const circleEl = this.svgEl?.querySelector(`#orbital-particle-${p.id}`);
         if (!circleEl) return;
 
         const θ = p.orbitalPhase;
@@ -383,7 +360,7 @@ export class OrbitalLoader {
     }
 
     this.particles.forEach((p) => {
-      const circleEl = this.svgEl?.querySelector(`#orbital-particle-${p.id}`) as SVGCircleElement | null;
+      const circleEl = this.svgEl?.querySelector(`#orbital-particle-${p.id}`);
       if (!circleEl) return;
 
       // Handle organic orbit breakdown decay & stabilization
@@ -434,7 +411,7 @@ export class OrbitalLoader {
   /**
    * Triggers an organic orbit breakdown event on a random particle.
    */
-  public triggerOrbitPerturbation(): void {
+  triggerOrbitPerturbation() {
     if (this.particles.length === 0 || this.config.reducedMotion) return;
 
     // Pick a particle to break orbit
@@ -453,7 +430,7 @@ export class OrbitalLoader {
   /**
    * Animation frame loop tick.
    */
-  private tick = (timestamp: number): void => {
+  tick = (timestamp) => {
     if (!this.isRunning) return;
 
     if (!this.lastTimestamp) this.lastTimestamp = timestamp;
@@ -494,7 +471,7 @@ export class OrbitalLoader {
   /**
    * Starts the animation loop.
    */
-  public start(): void {
+  start() {
     if (this.isRunning) return;
     this.isRunning = true;
     this.isPausedState = false;
@@ -505,7 +482,7 @@ export class OrbitalLoader {
   /**
    * Stops the animation loop.
    */
-  public stop(): void {
+  stop() {
     this.isRunning = false;
     if (this.animFrameId !== null) {
       cancelAnimationFrame(this.animFrameId);
@@ -516,32 +493,32 @@ export class OrbitalLoader {
   /**
    * Pauses simulation updates.
    */
-  public pause(): void {
+  pause() {
     this.isPausedState = true;
   }
 
   /**
    * Resumes simulation updates.
    */
-  public resume(): void {
+  resume() {
     this.isPausedState = false;
   }
 
-  public isPaused(): boolean {
+  isPaused() {
     return this.isPausedState;
   }
 
   /**
    * Updates configuration dynamically.
    */
-  public setPalette(palette: string[]): void {
+  setPalette(palette) {
     if (!palette || palette.length < 2) return;
     this.config.palette = palette;
     this.chromaticPulse.updateConfig({ palette });
     this.renderInitialDOM();
   }
 
-  public setParticleCount(count: number): void {
+  setParticleCount(count) {
     const clamped = Math.max(8, Math.min(36, count));
     if (clamped === this.config.particleCount) return;
     this.config.particleCount = clamped;
@@ -549,22 +526,22 @@ export class OrbitalLoader {
     this.renderInitialDOM();
   }
 
-  public setSpeed(speed: number): void {
+  setSpeed(speed) {
     this.config.speed = Math.max(0.1, Math.min(5.0, speed));
   }
 
-  public setIntensity(intensity: number): void {
+  setIntensity(intensity) {
     this.config.intensity = Math.max(0.1, Math.min(1.5, intensity));
   }
 
-  public setDepth(enabled: boolean): void {
+  setDepth(enabled) {
     if (enabled === this.config.depth) return;
     this.config.depth = enabled;
     this.initOrbitalParticles();
     this.renderInitialDOM();
   }
 
-  public setReducedMotion(enabled: boolean): void {
+  setReducedMotion(enabled) {
     this.config.reducedMotion = enabled;
     this.chromaticPulse.updateConfig({ reducedMotion: enabled });
     if (this.containerEl) {
@@ -577,7 +554,7 @@ export class OrbitalLoader {
     this.updateRenderFrame();
   }
 
-  public getFPS(): number {
+  getFPS() {
     return this.currentFPS;
   }
 
@@ -585,7 +562,7 @@ export class OrbitalLoader {
    * Triggers Thermal Glow exit discharge sequence (~350ms),
    * accelerating particles outward before dissolving and firing onDismiss.
    */
-  public resolve(onDismiss?: () => void): void {
+  resolve(onDismiss) {
     if (this.isThermalActive) return;
     this.onDismissCallback = onDismiss;
 
@@ -605,7 +582,7 @@ export class OrbitalLoader {
   /**
    * Resets loader simulation to initial state.
    */
-  public reset(): void {
+  reset() {
     this.stop();
     this.isThermalActive = false;
     this.thermalStartTime = 0;
@@ -619,7 +596,7 @@ export class OrbitalLoader {
     this.start();
   }
 
-  public destroy(): void {
+  destroy() {
     this.stop();
     if (this.containerEl) {
       this.containerEl.innerHTML = '';
