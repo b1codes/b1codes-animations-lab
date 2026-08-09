@@ -2,9 +2,9 @@ active_agents:
 - CLAUDE
 - ANTIGRAVITY
 bundles: {}
-clickup_list_id: null
-default_branch: null
-github_owner: null
-github_repo: null
+clickup_list_id: '901418938929'
+default_branch: main
+github_owner: b1codes
+github_repo: b1codes-animations-lab
 skillsmp_api_key: null
-upstream_repo: ''
+upstream_repo: b1codes/b1codes-animations-lab
