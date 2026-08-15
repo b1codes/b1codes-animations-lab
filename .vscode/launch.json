@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Lab (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/lab",
+      "preLaunchTask": "serve-lab"
+    },
+    {
+      "name": "Launch Lab (Direct File / Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "file": "${workspaceFolder}/lab/index.html"
+    },
+    {
+      "name": "Run Lab Server (npm run lab)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "lab"],
+      "console": "integratedTerminal"
+    }
+  ]
+}
