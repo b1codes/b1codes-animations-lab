@@ -19,6 +19,7 @@
   height: var(--neural-loader-size);
   background-color: var(--neural-bg-color);
   position: relative;
+  overflow: hidden;
   user-select: none;
   box-sizing: border-box;
 }

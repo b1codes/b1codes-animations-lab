@@ -20,6 +20,7 @@
   height: var(--cascade-loader-height);
   background-color: var(--cascade-bg-color);
   position: relative;
+  overflow: hidden;
   user-select: none;
   box-sizing: border-box;
 }

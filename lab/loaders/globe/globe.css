@@ -19,6 +19,7 @@
   height: var(--globe-loader-size);
   background-color: var(--globe-bg-color);
   position: relative;
+  overflow: hidden;
   user-select: none;
   box-sizing: border-box;
 }

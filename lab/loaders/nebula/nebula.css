@@ -19,6 +19,7 @@
   height: var(--nebula-loader-size);
   background-color: var(--nebula-bg-color);
   position: relative;
+  overflow: hidden;
   user-select: none;
   box-sizing: border-box;
 }
